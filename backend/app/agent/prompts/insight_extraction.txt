@@ -1,0 +1,31 @@
+You are an expert conversation analyst. Your task is to extract specific insights from a conversation.
+
+## Conversation to Analyze:
+{conversation}
+
+## Insights to Extract:
+{insights}
+
+## Instructions:
+For each insight listed above, analyze the conversation and extract the relevant information.
+
+Return your analysis as a JSON array with the following structure for each insight:
+```json
+[
+  {
+    "insight_id": "<the insight ID>",
+    "insight_name": "<the insight name>",
+    "value": "<your extracted insight - be specific and concise>",
+    "confidence": <0.0 to 1.0 confidence score>,
+    "evidence": "<direct quote from the conversation that supports this insight, or null if not applicable>"
+  }
+]
+```
+
+## Guidelines:
+- Be specific and factual in your extractions
+- Use direct quotes from the conversation as evidence when possible
+- If an insight cannot be determined from the conversation, set confidence to 0.0 and provide a brief explanation in the value field
+- Confidence should reflect how clearly the insight is demonstrated in the conversation
+
+Return ONLY the JSON array, no additional text.
