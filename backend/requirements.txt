@@ -18,3 +18,8 @@ openai==1.10.0
 # Utilities
 python-dotenv==1.0.0
 aiofiles==23.2.1
+
+# Evaluation
+deepeval>=1.1.0
+pytest>=7.4.0
+pytest-asyncio>=0.23.0

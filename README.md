@@ -84,6 +84,7 @@ agent-assitant/
 │   ├── app/
 │   │   ├── agent/       # AI agent logic
 │   │   ├── api/         # API routes
+│   │   ├── evaluation/  # DeepEval test suites
 │   │   ├── models/      # Data models
 │   │   ├── services/    # Business logic
 │   │   ├── config.py    # Configuration
@@ -115,6 +116,34 @@ agent-assitant/
 Once the backend is running, visit:
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
+
+## 🧪 Evaluation
+
+The project uses [DeepEval](https://docs.confident-ai.com/) to evaluate the LangChain agent's performance.
+
+### Running Evaluations
+
+```bash
+cd backend
+source venv/bin/activate
+
+# Install evaluation dependencies (if not already)
+pip install -r requirements.txt
+
+# Run all evaluations
+deepeval test run app/evaluation/
+
+# Run with verbose output
+deepeval test run app/evaluation/ -v
+```
+
+### Metrics
+
+| Task | Metrics |
+|------|---------|
+| Insight Extraction | Answer Relevancy, G-Eval (Accuracy) |
+| Question Answering | Answer Relevancy, Faithfulness |
+| Summary Generation | Summarization, Hallucination |
 
 ## 📝 License
 
