@@ -5,6 +5,8 @@ from typing import Optional
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
+from langchain.output_parsers import PydanticOutputParser
+from .structured_output import InsightResult, AnswerResult, Summary
 
 from app.config import get_settings
 
@@ -36,34 +38,37 @@ class ConversationOrchestrator:
         variables = re.findall(r'\{(\w+)\}', template)
         return PromptTemplate(template=template, input_variables=list(set(variables)))
     
-    async def extract_insights(self, conversation_text: str, insights_text: str) -> str:
-        """Extract insights from a conversation using LLM."""
-        prompt = self._create_prompt_template("insight_extraction")
-        chain = prompt | self.llm
-        result = await chain.ainvoke({
-            "conversation": conversation_text,
-            "insights": insights_text
-        })
-        return result.content
+    async def extract_insights(self, conversation_text: str, insights_text: str) -> InsightResult:
+    """Extract insights from a conversation using LLM with structured output validation."""
+    prompt = self._create_prompt_template("insight_extraction")
+    parser = PydanticOutputParser(model=InsightResult)
+    chain = prompt | self.llm | parser
+    result = await chain.ainvoke({
+        "conversation": conversation_text,
+        "insights": insights_text
+    })
+    return result
     
-    async def answer_questions(self, conversation_text: str, questions_text: str) -> str:
-        """Find answers to qualifying questions in a conversation."""
-        prompt = self._create_prompt_template("question_answering")
-        chain = prompt | self.llm
-        result = await chain.ainvoke({
-            "conversation": conversation_text,
-            "questions": questions_text
-        })
-        return result.content
+    async def answer_questions(self, conversation_text: str, questions_text: str) -> AnswerResult:
+    """Find answers to qualifying questions in a conversation with structured output validation."""
+    prompt = self._create_prompt_template("question_answering")
+    parser = PydanticOutputParser(model=AnswerResult)
+    chain = prompt | self.llm | parser
+    result = await chain.ainvoke({
+        "conversation": conversation_text,
+        "questions": questions_text
+    })
+    return result
     
-    async def generate_summary(self, conversation_text: str) -> str:
-        """Generate a summary of the conversation."""
-        prompt = self._create_prompt_template("conversation_summary")
-        chain = prompt | self.llm
-        result = await chain.ainvoke({
-            "conversation": conversation_text
-        })
-        return result.content
+    async def generate_summary(self, conversation_text: str) -> Summary:
+    """Generate a summary of the conversation with structured output validation."""
+    prompt = self._create_prompt_template("conversation_summary")
+    parser = PydanticOutputParser(model=Summary)
+    chain = prompt | self.llm | parser
+    result = await chain.ainvoke({
+        "conversation": conversation_text
+    })
+    return result
 
 
 # Singleton instance
