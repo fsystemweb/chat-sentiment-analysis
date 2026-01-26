@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from functools import lru_cache
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -9,15 +10,21 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # OpenAI Configuration
-    openai_api_key: str = ""
+    openai_api_key: str
     openai_model: str = "gpt-4"
+
+    @field_validator("openai_api_key")
+    def validate_openai_api_key(cls, v):
+        if not v:
+            raise ValueError("OPENAI_API_KEY must be set")
+        return v
     
     # Data directory
     data_dir: Path = Path(__file__).parent.parent / "data"
     
     # API Configuration
     api_prefix: str = "/api"
-    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     
     class Config:
         env_file = ".env"

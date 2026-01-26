@@ -1,17 +1,27 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { conversationsAPI, insightsAPI, questionsAPI, analysisAPI } from '@/lib/api';
-import type { ConversationSummary, Insight, Question, AggregateAnalysis } from '@/lib/types';
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import {
+  conversationsAPI,
+  insightsAPI,
+  questionsAPI,
+  analysisAPI,
+} from '@/lib/api'
+import type {
+  ConversationSummary,
+  Insight,
+  Question,
+  AggregateAnalysis,
+} from '@/lib/types'
 
 export default function Dashboard() {
-  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
-  const [insights, setInsights] = useState<Insight[]>([]);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [aggregate, setAggregate] = useState<AggregateAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationSummary[]>([])
+  const [insights, setInsights] = useState<Insight[]>([])
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [aggregate, setAggregate] = useState<AggregateAnalysis | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -21,37 +31,37 @@ export default function Dashboard() {
           insightsAPI.getAll(),
           questionsAPI.getAll(),
           analysisAPI.getAggregate().catch(() => null),
-        ]);
-        setConversations(convs);
-        setInsights(ins);
-        setQuestions(ques);
-        setAggregate(agg);
+        ])
+        setConversations(convs)
+        setInsights(ins)
+        setQuestions(ques)
+        setAggregate(agg)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data');
+        setError(err instanceof Error ? err.message : 'Failed to load data')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="spinner" />
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
       <div className="card border-[var(--danger)]">
         <p className="text-[var(--danger)]">Error: {error}</p>
-        <p className="text-[var(--muted)] text-sm mt-2">
+        <p className="mt-2 text-sm text-[var(--muted)]">
           Make sure the backend server is running at http://localhost:8000
         </p>
       </div>
-    );
+    )
   }
 
   const stats = [
@@ -64,14 +74,14 @@ export default function Dashboard() {
     },
     {
       label: 'Active Insights',
-      value: insights.filter(i => i.active).length,
+      value: insights.filter((i) => i.active).length,
       icon: '💡',
       href: '/insights',
       color: 'var(--secondary)',
     },
     {
       label: 'Active Questions',
-      value: questions.filter(q => q.active).length,
+      value: questions.filter((q) => q.active).length,
       icon: '❓',
       href: '/questions',
       color: 'var(--warning)',
@@ -83,22 +93,22 @@ export default function Dashboard() {
       href: '/analysis',
       color: 'var(--primary)',
     },
-  ];
+  ]
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="fade-in space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-[var(--muted)] mt-2">
+        <p className="mt-2 text-[var(--muted)]">
           Welcome to the Conversation Insights Analyzer
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
-            <div className="card cursor-pointer group">
+            <div className="card group cursor-pointer">
               <div className="flex items-center justify-between">
                 <span className="text-3xl">{stat.icon}</span>
                 <span
@@ -108,7 +118,7 @@ export default function Dashboard() {
                   {stat.value}
                 </span>
               </div>
-              <p className="text-[var(--muted)] mt-2 group-hover:text-[var(--foreground)] transition-colors">
+              <p className="mt-2 text-[var(--muted)] transition-colors group-hover:text-[var(--foreground)]">
                 {stat.label}
               </p>
             </div>
@@ -118,7 +128,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+        <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
         <div className="flex flex-wrap gap-3">
           <Link href="/insights" className="btn btn-primary">
             <span>💡</span> Manage Insights
@@ -137,9 +147,12 @@ export default function Dashboard() {
 
       {/* Recent Conversations */}
       <div className="card">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Recent Conversations</h2>
-          <Link href="/conversations" className="text-[var(--primary)] text-sm hover:underline">
+          <Link
+            href="/conversations"
+            className="text-sm text-[var(--primary)] hover:underline"
+          >
             View all →
           </Link>
         </div>
@@ -151,7 +164,7 @@ export default function Dashboard() {
               <Link
                 key={conv.id}
                 href={`/conversations/${conv.id}`}
-                className="block p-4 rounded-lg bg-[var(--background)] hover:bg-[var(--card-hover)] transition-colors"
+                className="block rounded-lg bg-[var(--background)] p-4 transition-colors hover:bg-[var(--card-hover)]"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -175,5 +188,5 @@ export default function Dashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }
