@@ -2,244 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #141414;
-  --card-hover: #1a1a1a;
-  --border: #2a2a2a;
-  --primary: #6366f1;
-  --primary-hover: #818cf8;
-  --secondary: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --muted: #737373;
+@layer base {
+  :root {
+    --background: #F8FAFC;
+    --foreground: #1E293B;
+
+    --card: #FFFFFF;
+    --card-foreground: #1E293B;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #1E293B;
+
+    --primary: #3B82F6;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #F1F5F9;
+    --secondary-foreground: #1E293B;
+
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+
+    --accent: #F1F5F9;
+    --accent-foreground: #1E293B;
+
+    --success: #10B981;
+    --success-foreground: #FFFFFF;
+
+    --warning: #F59E0B;
+    --warning-foreground: #FFFFFF;
+
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #3B82F6;
+
+    --radius: 0.75rem;
+  }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@layer base {
+  * {
+    border-color: var(--border);
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
-}
-
-/* Custom scrollbar */
+/* Custom scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background-color: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background-color: var(--border);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background-color: var(--muted-foreground);
 }
 
-/* Card styles */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  background: var(--card-hover);
-  border-color: var(--primary);
-}
-
-/* Button styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: none;
-  gap: 0.5rem;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-hover);
-}
-
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--foreground);
-}
-
-.btn-secondary:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-danger:hover {
-  opacity: 0.9;
-}
-
-.btn-success {
-  background: var(--secondary);
-  color: white;
-}
-
-.btn-success:hover {
-  opacity: 0.9;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Input styles */
-.input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--foreground);
-  font-size: 0.875rem;
-  transition: border-color 0.2s ease;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.input::placeholder {
-  color: var(--muted);
-}
-
-/* Textarea */
-textarea.input {
-  min-height: 100px;
-  resize: vertical;
-}
-
-/* Badge styles */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.badge-primary {
-  background: rgba(99, 102, 241, 0.2);
-  color: var(--primary);
-}
-
-.badge-success {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--secondary);
-}
-
-.badge-warning {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--warning);
-}
-
-.badge-danger {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--danger);
-}
-
-.badge-neutral {
-  background: rgba(115, 115, 115, 0.2);
-  color: var(--muted);
-}
-
-/* Confidence bar */
-.confidence-bar {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.confidence-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-/* Message bubble */
-.message {
-  padding: 1rem;
-  border-radius: 12px;
-  max-width: 85%;
-}
-
-.message-user {
-  background: var(--primary);
-  color: white;
-  margin-left: auto;
-  border-bottom-right-radius: 4px;
-}
-
-.message-agent {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-}
-
-/* Loading spinner */
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Fade in animation */
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -250,48 +91,36 @@ textarea.input {
   animation: fadeIn 0.3s ease forwards;
 }
 
-/* Pulse animation for loading states */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+/* Message bubble styles */
+.message {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  max-width: 85%;
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.message-user {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  margin-left: auto;
+  border-bottom-right-radius: 0.25rem;
 }
 
-/* Toggle switch */
-.toggle {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  background: var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.message-agent {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 0.25rem;
 }
 
-.toggle.active {
-  background: var(--primary);
+/* Progress bar */
+.progress-bar {
+  height: 0.375rem;
+  background-color: var(--muted);
+  border-radius: 9999px;
+  overflow: hidden;
 }
 
-.toggle::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s ease;
-}
-
-.toggle.active::after {
-  transform: translateX(20px);
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: all 0.3s;
 }

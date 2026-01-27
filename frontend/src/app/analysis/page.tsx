@@ -2,17 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import {
+  MessageSquare,
+  CheckCircle,
+  BarChart3,
+  Lightbulb,
+  HelpCircle,
+  FileText,
+} from 'lucide-react'
 import { analysisAPI } from '@/lib/api'
 import type { AggregateAnalysis, ConversationAnalysis } from '@/lib/types'
+
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 export default function AnalysisPage() {
   const [aggregate, setAggregate] = useState<AggregateAnalysis | null>(null)
   const [allAnalyses, setAllAnalyses] = useState<ConversationAnalysis[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeView, setActiveView] = useState<
-    'overview' | 'insights' | 'questions'
-  >('overview')
 
   useEffect(() => {
     loadData()
@@ -38,16 +49,16 @@ export default function AnalysisPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="spinner" />
+        <Spinner size="lg" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="card border-[var(--danger)]">
-        <p className="text-[var(--danger)]">{error}</p>
-      </div>
+      <Card className="border-destructive">
+        <p className="text-destructive">{error}</p>
+      </Card>
     )
   }
 
@@ -55,7 +66,7 @@ export default function AnalysisPage() {
     <div className="fade-in space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Analysis Overview</h1>
-        <p className="mt-2 text-[var(--muted)]">
+        <p className="mt-2 text-muted-foreground">
           Aggregate insights and question results across all conversations
         </p>
       </div>
@@ -63,258 +74,288 @@ export default function AnalysisPage() {
       {/* Stats */}
       {aggregate && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="card">
-            <div className="mb-2 text-4xl">💬</div>
-            <div className="text-3xl font-bold">
-              {aggregate.total_conversations}
+          <Card>
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-3">
+                <MessageSquare className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold">
+                  {aggregate.total_conversations}
+                </div>
+                <div className="text-muted-foreground">Total Conversations</div>
+              </div>
             </div>
-            <div className="text-[var(--muted)]">Total Conversations</div>
-          </div>
-          <div className="card">
-            <div className="mb-2 text-4xl">✅</div>
-            <div className="text-3xl font-bold text-[var(--secondary)]">
-              {aggregate.analyzed_conversations}
+          </Card>
+          <Card>
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-success/10 p-3">
+                <CheckCircle className="h-6 w-6 text-success" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-success">
+                  {aggregate.analyzed_conversations}
+                </div>
+                <div className="text-muted-foreground">Analyzed</div>
+              </div>
             </div>
-            <div className="text-[var(--muted)]">Analyzed</div>
-          </div>
-          <div className="card">
-            <div className="mb-2 text-4xl">📊</div>
-            <div className="text-3xl font-bold text-[var(--primary)]">
-              {Math.round(
-                (aggregate.analyzed_conversations /
-                  aggregate.total_conversations) *
-                  100
-              ) || 0}
-              %
+          </Card>
+          <Card>
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-3">
+                <BarChart3 className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-primary">
+                  {Math.round(
+                    (aggregate.analyzed_conversations /
+                      aggregate.total_conversations) *
+                    100
+                  ) || 0}
+                  %
+                </div>
+                <div className="text-muted-foreground">Coverage</div>
+              </div>
             </div>
-            <div className="text-[var(--muted)]">Coverage</div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* View Tabs */}
-      <div className="flex gap-2">
-        {(['overview', 'insights', 'questions'] as const).map((view) => (
-          <button
-            key={view}
-            onClick={() => setActiveView(view)}
-            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
-              activeView === view
-                ? 'bg-[var(--primary)] text-white'
-                : 'bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            {view === 'overview' && '📋 Recent Analyses'}
-            {view === 'insights' && '💡 Insight Trends'}
-            {view === 'questions' && '❓ Question Stats'}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">
+            <FileText className="mr-1 h-4 w-4" />
+            Recent Analyses
+          </TabsTrigger>
+          <TabsTrigger value="insights">
+            <Lightbulb className="mr-1 h-4 w-4" />
+            Insight Trends
+          </TabsTrigger>
+          <TabsTrigger value="questions">
+            <HelpCircle className="mr-1 h-4 w-4" />
+            Question Stats
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Content */}
-      {activeView === 'overview' && (
-        <div className="space-y-4">
-          {allAnalyses.length === 0 ? (
-            <div className="card py-12 text-center">
-              <p className="mb-4 text-4xl">📊</p>
-              <p className="text-[var(--muted)]">No analyses yet.</p>
-              <Link href="/conversations" className="btn btn-primary mt-4">
-                Analyze Conversations
-              </Link>
-            </div>
-          ) : (
-            allAnalyses.map((analysis) => (
-              <Link
-                key={analysis.id}
-                href={`/conversations/${analysis.conversation_id}`}
-              >
-                <div className="card cursor-pointer hover:border-[var(--primary)]">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="font-semibold">
-                      Conversation: {analysis.conversation_id}
-                    </h3>
-                    <span className="text-sm text-[var(--muted)]">
-                      {new Date(analysis.analyzed_at).toLocaleString()}
-                    </span>
-                  </div>
-                  {analysis.summary && (
-                    <p className="mb-3 text-sm text-[var(--muted)]">
-                      {analysis.summary}
-                    </p>
-                  )}
-                  <div className="flex gap-4 text-sm">
-                    <span className="badge badge-primary">
-                      💡 {analysis.insights.length} insights
-                    </span>
-                    <span className="badge badge-success">
-                      ✓ {analysis.questions.filter((q) => q.answered).length}/
-                      {analysis.questions.length} answered
-                    </span>
+        <TabsContent value="overview">
+          <div className="space-y-4">
+            {allAnalyses.length === 0 ? (
+              <Card className="py-12 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-primary/10 p-4">
+                    <BarChart3 className="h-8 w-8 text-primary" />
                   </div>
                 </div>
-              </Link>
-            ))
-          )}
-        </div>
-      )}
-
-      {activeView === 'insights' && aggregate && (
-        <div className="space-y-4">
-          {Object.keys(aggregate.insight_summaries).length === 0 ? (
-            <div className="card py-12 text-center">
-              <p className="mb-4 text-4xl">💡</p>
-              <p className="text-[var(--muted)]">
-                No insight data yet. Analyze some conversations first.
-              </p>
-            </div>
-          ) : (
-            Object.entries(aggregate.insight_summaries).map(([name, data]) => (
-              <div key={name} className="card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{name}</h3>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-[var(--muted)]">
-                      Extracted {data.total_extractions} times
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--muted)]">
-                        Avg confidence:
-                      </span>
-                      <span
-                        className="font-medium"
-                        style={{
-                          color:
-                            data.avg_confidence > 0.7
-                              ? 'var(--secondary)'
-                              : data.avg_confidence > 0.4
-                                ? 'var(--warning)'
-                                : 'var(--danger)',
-                        }}
-                      >
-                        {Math.round(data.avg_confidence * 100)}%
+                <p className="text-muted-foreground">No analyses yet.</p>
+                <Link href="/conversations">
+                  <Button className="mt-4">Analyze Conversations</Button>
+                </Link>
+              </Card>
+            ) : (
+              allAnalyses.map((analysis) => (
+                <Link
+                  key={analysis.id}
+                  href={`/conversations/${analysis.conversation_id}`}
+                >
+                  <Card className="cursor-pointer hover:border-primary">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="font-semibold">
+                        Conversation: {analysis.conversation_id}
+                      </h3>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(analysis.analyzed_at).toLocaleString()}
                       </span>
                     </div>
+                    {analysis.summary && (
+                      <p className="mb-3 text-sm text-muted-foreground">
+                        {analysis.summary}
+                      </p>
+                    )}
+                    <div className="flex gap-4 text-sm">
+                      <Badge variant="default">
+                        <Lightbulb className="mr-1 h-3 w-3" />
+                        {analysis.insights.length} insights
+                      </Badge>
+                      <Badge variant="success">
+                        <CheckCircle className="mr-1 h-3 w-3" />
+                        {analysis.questions.filter((q) => q.answered).length}/
+                        {analysis.questions.length} answered
+                      </Badge>
+                    </div>
+                  </Card>
+                </Link>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="insights">
+          <div className="space-y-4">
+            {!aggregate || Object.keys(aggregate.insight_summaries).length === 0 ? (
+              <Card className="py-12 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-primary/10 p-4">
+                    <Lightbulb className="h-8 w-8 text-primary" />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {data.values.slice(0, 5).map((val, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between rounded-lg bg-[var(--background)] p-3"
-                    >
-                      <Link
-                        href={`/conversations/${val.conversation_id}`}
-                        className="text-sm text-[var(--primary)] hover:underline"
-                      >
-                        {val.conversation_id}
-                      </Link>
-                      <span className="mx-4 flex-1 text-[var(--muted)]">
-                        {val.value}
-                      </span>
-                      <span className="text-sm font-medium">
-                        {Math.round(val.confidence * 100)}%
-                      </span>
-                    </div>
-                  ))}
-                  {data.values.length > 5 && (
-                    <p className="text-center text-sm text-[var(--muted)]">
-                      +{data.values.length - 5} more
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {activeView === 'questions' && aggregate && (
-        <div className="space-y-4">
-          {Object.keys(aggregate.question_summaries).length === 0 ? (
-            <div className="card py-12 text-center">
-              <p className="mb-4 text-4xl">❓</p>
-              <p className="text-[var(--muted)]">
-                No question data yet. Analyze some conversations first.
-              </p>
-            </div>
-          ) : (
-            Object.entries(aggregate.question_summaries).map(
-              ([question, data]) => (
-                <div key={question} className="card">
+                <p className="text-muted-foreground">
+                  No insight data yet. Analyze some conversations first.
+                </p>
+              </Card>
+            ) : (
+              Object.entries(aggregate.insight_summaries).map(([name, data]) => (
+                <Card key={name}>
                   <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-semibold">{question}</h3>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`badge ${
-                          data.times_answered / data.total_checked > 0.7
-                            ? 'badge-success'
-                            : data.times_answered / data.total_checked > 0.3
-                              ? 'badge-warning'
-                              : 'badge-danger'
-                        }`}
-                      >
-                        {data.times_answered}/{data.total_checked} answered
+                    <h3 className="text-lg font-semibold">{name}</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-muted-foreground">
+                        Extracted {data.total_extractions} times
                       </span>
-                      <span className="text-sm text-[var(--muted)]">
-                        (
-                        {Math.round(
-                          (data.times_answered / data.total_checked) * 100
-                        )}
-                        %)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Answer rate bar */}
-                  <div className="confidence-bar mb-4">
-                    <div
-                      className="confidence-fill"
-                      style={{
-                        width: `${(data.times_answered / data.total_checked) * 100}%`,
-                        background:
-                          data.times_answered / data.total_checked > 0.7
-                            ? 'var(--secondary)'
-                            : data.times_answered / data.total_checked > 0.3
-                              ? 'var(--warning)'
-                              : 'var(--danger)',
-                      }}
-                    />
-                  </div>
-
-                  {data.answers.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-[var(--muted)]">
-                        Answers found:
-                      </h4>
-                      {data.answers.slice(0, 5).map((ans, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-4 rounded-lg bg-[var(--background)] p-3"
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          Avg confidence:
+                        </span>
+                        <span
+                          className="font-medium"
+                          style={{
+                            color:
+                              data.avg_confidence > 0.7
+                                ? 'rgb(var(--success))'
+                                : data.avg_confidence > 0.4
+                                  ? 'rgb(var(--warning))'
+                                  : 'rgb(var(--destructive))',
+                          }}
                         >
-                          <Link
-                            href={`/conversations/${ans.conversation_id}`}
-                            className="text-sm text-[var(--primary)] hover:underline"
-                          >
-                            {ans.conversation_id}
-                          </Link>
-                          <span className="text-[var(--foreground)]">
-                            {ans.answer}
-                          </span>
-                        </div>
-                      ))}
-                      {data.answers.length > 5 && (
-                        <p className="text-center text-sm text-[var(--muted)]">
-                          +{data.answers.length - 5} more
-                        </p>
-                      )}
+                          {Math.round(data.avg_confidence * 100)}%
+                        </span>
+                      </div>
                     </div>
-                  )}
+                  </div>
+                  <div className="space-y-2">
+                    {data.values.slice(0, 5).map((val, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between rounded-lg bg-muted/50 p-3"
+                      >
+                        <Link
+                          href={`/conversations/${val.conversation_id}`}
+                          className="text-sm text-primary hover:underline"
+                        >
+                          {val.conversation_id}
+                        </Link>
+                        <span className="mx-4 flex-1 text-muted-foreground">
+                          {val.value}
+                        </span>
+                        <span className="text-sm font-medium">
+                          {Math.round(val.confidence * 100)}%
+                        </span>
+                      </div>
+                    ))}
+                    {data.values.length > 5 && (
+                      <p className="text-center text-sm text-muted-foreground">
+                        +{data.values.length - 5} more
+                      </p>
+                    )}
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="questions">
+          <div className="space-y-4">
+            {!aggregate || Object.keys(aggregate.question_summaries).length === 0 ? (
+              <Card className="py-12 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-warning/10 p-4">
+                    <HelpCircle className="h-8 w-8 text-warning" />
+                  </div>
                 </div>
+                <p className="text-muted-foreground">
+                  No question data yet. Analyze some conversations first.
+                </p>
+              </Card>
+            ) : (
+              Object.entries(aggregate.question_summaries).map(
+                ([question, data]) => (
+                  <Card key={question}>
+                    <div className="mb-4 flex items-center justify-between">
+                      <h3 className="font-semibold">{question}</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            data.times_answered / data.total_checked > 0.7
+                              ? 'success'
+                              : data.times_answered / data.total_checked > 0.3
+                                ? 'warning'
+                                : 'destructive'
+                          }
+                        >
+                          {data.times_answered}/{data.total_checked} answered
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          (
+                          {Math.round(
+                            (data.times_answered / data.total_checked) * 100
+                          )}
+                          %)
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Answer rate bar */}
+                    <div className="mb-4 h-2 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${(data.times_answered / data.total_checked) * 100}%`,
+                          backgroundColor:
+                            data.times_answered / data.total_checked > 0.7
+                              ? 'rgb(var(--success))'
+                              : data.times_answered / data.total_checked > 0.3
+                                ? 'rgb(var(--warning))'
+                                : 'rgb(var(--destructive))',
+                        }}
+                      />
+                    </div>
+
+                    {data.answers.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Answers found:
+                        </h4>
+                        {data.answers.slice(0, 5).map((ans, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-4 rounded-lg bg-muted/50 p-3"
+                          >
+                            <Link
+                              href={`/conversations/${ans.conversation_id}`}
+                              className="text-sm text-primary hover:underline"
+                            >
+                              {ans.conversation_id}
+                            </Link>
+                            <span className="text-foreground">
+                              {ans.answer}
+                            </span>
+                          </div>
+                        ))}
+                        {data.answers.length > 5 && (
+                          <p className="text-center text-sm text-muted-foreground">
+                            +{data.answers.length - 5} more
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+                )
               )
-            )
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

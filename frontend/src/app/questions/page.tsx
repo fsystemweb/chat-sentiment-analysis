@@ -1,8 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Plus, Pencil, Trash2, HelpCircle } from 'lucide-react'
 import { questionsAPI } from '@/lib/api'
 import type { Question, QuestionCreate } from '@/lib/types'
+
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Spinner } from '@/components/ui/spinner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -88,7 +103,7 @@ export default function QuestionsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="spinner" />
+        <Spinner size="lg" />
       </div>
     )
   }
@@ -98,156 +113,147 @@ export default function QuestionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Qualifying Questions</h1>
-          <p className="mt-2 text-[var(--muted)]">
+          <p className="mt-2 text-muted-foreground">
             Define questions to look for and extract answers from conversations
           </p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn btn-primary">
-          <span>+</span> Add Question
-        </button>
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="h-4 w-4" />
+          Add Question
+        </Button>
       </div>
 
       {error && (
-        <div className="card border-[var(--danger)]">
-          <p className="text-[var(--danger)]">{error}</p>
+        <Card className="border-destructive">
+          <p className="text-destructive">{error}</p>
           <button
             onClick={() => setError(null)}
-            className="mt-2 text-sm text-[var(--muted)] hover:underline"
+            className="mt-2 text-sm text-muted-foreground hover:underline"
           >
             Dismiss
           </button>
-        </div>
+        </Card>
       )}
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="card mx-4 w-full max-w-lg">
-            <h2 className="mb-4 text-xl font-semibold">
+      {/* Form Dialog */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
               {editingId ? 'Edit Question' : 'New Question'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Question
-                </label>
-                <input
-                  type="text"
-                  className="input"
-                  placeholder="e.g., How many employees do you have?"
-                  value={formData.question}
-                  onChange={(e) =>
-                    setFormData({ ...formData, question: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Description{' '}
-                  <span className="text-[var(--muted)]">(optional)</span>
-                </label>
-                <textarea
-                  className="input"
-                  placeholder="Additional context about what you're looking for..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  className={`toggle ${formData.active ? 'active' : ''}`}
-                  onClick={() =>
-                    setFormData({ ...formData, active: !formData.active })
-                  }
-                />
-                <span className="text-sm">Active for analysis</span>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="btn btn-secondary flex-1"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary flex-1"
-                >
-                  {saving ? (
-                    <span className="spinner" />
-                  ) : editingId ? (
-                    'Update'
-                  ) : (
-                    'Create'
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Question
+              </label>
+              <Input
+                placeholder="e.g., How many employees do you have?"
+                value={formData.question}
+                onChange={(e) =>
+                  setFormData({ ...formData, question: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Description{' '}
+                <span className="text-muted-foreground">(optional)</span>
+              </label>
+              <Textarea
+                placeholder="Additional context about what you're looking for..."
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={formData.active}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, active: checked })
+                }
+              />
+              <span className="text-sm">Active for analysis</span>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetForm}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving} className="flex-1">
+                {saving ? <Spinner size="sm" /> : editingId ? 'Update' : 'Create'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Questions List */}
       {questions.length === 0 ? (
-        <div className="card py-12 text-center">
-          <p className="mb-4 text-4xl">❓</p>
-          <p className="text-[var(--muted)]">
+        <Card className="py-12 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="rounded-full bg-warning/10 p-4">
+              <HelpCircle className="h-8 w-8 text-warning" />
+            </div>
+          </div>
+          <p className="text-muted-foreground">
             No qualifying questions defined yet.
           </p>
-          <p className="mt-2 text-sm text-[var(--muted)]">
+          <p className="mt-2 text-sm text-muted-foreground">
             Add questions like &quot;What&apos;s your role?&quot; or
             &quot;What&apos;s your budget?&quot;
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4">
           {questions.map((question) => (
-            <div key={question.id} className="card">
+            <Card key={question.id}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-lg font-semibold">
                       {question.question}
                     </h3>
-                    <span
-                      className={`badge ${question.active ? 'badge-success' : 'badge-neutral'}`}
-                    >
+                    <Badge variant={question.active ? 'success' : 'outline'}>
                       {question.active ? 'Active' : 'Inactive'}
-                    </span>
+                    </Badge>
                   </div>
                   {question.description && (
-                    <p className="mt-2 text-[var(--muted)]">
+                    <p className="mt-2 text-muted-foreground">
                       {question.description}
                     </p>
                   )}
                 </div>
                 <div className="ml-4 flex items-center gap-2">
-                  <button
-                    onClick={() => handleToggleActive(question)}
-                    className={`toggle ${question.active ? 'active' : ''}`}
-                    title={question.active ? 'Deactivate' : 'Activate'}
+                  <Switch
+                    checked={question.active}
+                    onCheckedChange={() => handleToggleActive(question)}
                   />
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => startEdit(question)}
-                    className="btn btn-secondary"
                   >
-                    Edit
-                  </button>
-                  <button
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={() => handleDelete(question.id)}
-                    className="btn btn-danger"
                   >
-                    Delete
-                  </button>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

@@ -3,8 +3,27 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import {
+  ArrowLeft,
+  RefreshCw,
+  Search,
+  MessageSquare,
+  Calendar,
+  Users,
+  Lightbulb,
+  HelpCircle,
+  Check,
+  X,
+  FileText,
+} from 'lucide-react'
 import { conversationsAPI, analysisAPI } from '@/lib/api'
 import type { Conversation, ConversationAnalysis } from '@/lib/types'
+
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 export default function ConversationDetailPage() {
   const params = useParams()
@@ -15,9 +34,6 @@ export default function ConversationDetailPage() {
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<
-    'conversation' | 'insights' | 'questions'
-  >('conversation')
 
   const loadData = useCallback(async () => {
     try {
@@ -51,7 +67,6 @@ export default function ConversationDetailPage() {
     try {
       const result = await analysisAPI.run({ conversation_id: conversationId })
       setAnalysis(result)
-      setActiveTab('insights')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to run analysis')
     } finally {
@@ -62,20 +77,27 @@ export default function ConversationDetailPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="spinner" />
+        <Spinner size="lg" />
       </div>
     )
   }
 
   if (!conversation) {
     return (
-      <div className="card py-12 text-center">
-        <p className="mb-4 text-4xl">❌</p>
-        <p className="text-[var(--danger)]">Conversation not found</p>
-        <Link href="/conversations" className="btn btn-secondary mt-4">
-          ← Back to Conversations
+      <Card className="py-12 text-center">
+        <div className="mb-4 flex justify-center">
+          <div className="rounded-full bg-destructive/10 p-4">
+            <X className="h-8 w-8 text-destructive" />
+          </div>
+        </div>
+        <p className="text-destructive">Conversation not found</p>
+        <Link href="/conversations">
+          <Button variant="outline" className="mt-4">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Conversations
+          </Button>
         </Link>
-      </div>
+      </Card>
     )
   }
 
@@ -86,215 +108,246 @@ export default function ConversationDetailPage() {
         <div>
           <Link
             href="/conversations"
-            className="mb-2 inline-block text-sm text-[var(--muted)] hover:text-[var(--foreground)]"
+            className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Back to Conversations
+            <ArrowLeft className="h-4 w-4" />
+            Back to Conversations
           </Link>
           <h1 className="text-3xl font-bold">{conversation.metadata.title}</h1>
-          <div className="mt-2 flex items-center gap-4 text-sm text-[var(--muted)]">
+          <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
             {conversation.metadata.source && (
-              <span className="badge badge-primary">
-                {conversation.metadata.source}
-              </span>
+              <Badge variant="default">{conversation.metadata.source}</Badge>
             )}
-            <span>💬 {conversation.messages.length} messages</span>
+            <span className="inline-flex items-center gap-1">
+              <MessageSquare className="h-4 w-4" />
+              {conversation.messages.length} messages
+            </span>
             {conversation.metadata.date && (
-              <span>
-                📅 {new Date(conversation.metadata.date).toLocaleDateString()}
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                {new Date(conversation.metadata.date).toLocaleDateString()}
               </span>
             )}
             {conversation.metadata.participants &&
               conversation.metadata.participants.length > 0 && (
-                <span>👥 {conversation.metadata.participants.join(', ')}</span>
+                <span className="inline-flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  {conversation.metadata.participants.join(', ')}
+                </span>
               )}
           </div>
         </div>
-        <button
-          onClick={runAnalysis}
-          disabled={analyzing}
-          className="btn btn-primary"
-        >
+        <Button onClick={runAnalysis} disabled={analyzing}>
           {analyzing ? (
             <>
-              <span className="spinner" />
+              <Spinner size="sm" />
               Analyzing...
             </>
           ) : analysis ? (
-            '🔄 Re-analyze'
+            <>
+              <RefreshCw className="h-4 w-4" />
+              Re-analyze
+            </>
           ) : (
-            '🔍 Run Analysis'
+            <>
+              <Search className="h-4 w-4" />
+              Run Analysis
+            </>
           )}
-        </button>
+        </Button>
       </div>
 
       {error && (
-        <div className="card border-[var(--danger)]">
-          <p className="text-[var(--danger)]">{error}</p>
-        </div>
+        <Card className="border-destructive">
+          <p className="text-destructive">{error}</p>
+        </Card>
       )}
 
       {/* Summary */}
       {analysis?.summary && (
-        <div className="card from-[var(--primary)]/10 to-[var(--secondary)]/10 border-[var(--primary)]/30 bg-gradient-to-r">
-          <h3 className="mb-2 font-semibold">📝 AI Summary</h3>
-          <p className="text-[var(--muted)]">{analysis.summary}</p>
-        </div>
+        <Card className="bg-gradient-to-r from-primary/5 to-success/5 border-primary/20">
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <FileText className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="mb-1 font-semibold">AI Summary</h3>
+              <p className="text-muted-foreground">{analysis.summary}</p>
+            </div>
+          </div>
+        </Card>
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[var(--border)] pb-2">
-        {(['conversation', 'insights', 'questions'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`rounded-t-lg px-4 py-2 font-medium transition-colors ${
-              activeTab === tab
-                ? 'border border-[var(--border)] border-b-[var(--card)] bg-[var(--card)] text-[var(--foreground)]'
-                : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            {tab === 'conversation' && '💬 Conversation'}
-            {tab === 'insights' &&
-              `💡 Insights ${analysis ? `(${analysis.insights.length})` : ''}`}
-            {tab === 'questions' &&
-              `❓ Questions ${analysis ? `(${analysis.questions.length})` : ''}`}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="conversation">
+        <TabsList>
+          <TabsTrigger value="conversation">
+            <MessageSquare className="mr-1 h-4 w-4" />
+            Conversation
+          </TabsTrigger>
+          <TabsTrigger value="insights">
+            <Lightbulb className="mr-1 h-4 w-4" />
+            Insights {analysis ? `(${analysis.insights.length})` : ''}
+          </TabsTrigger>
+          <TabsTrigger value="questions">
+            <HelpCircle className="mr-1 h-4 w-4" />
+            Questions {analysis ? `(${analysis.questions.length})` : ''}
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Tab Content */}
-      {activeTab === 'conversation' && (
-        <div className="space-y-4">
-          {conversation.messages.map((message, index) => (
-            <div
-              key={index}
-              className={`message ${message.role === 'user' ? 'message-user' : 'message-agent'}`}
-            >
-              <div className="mb-1 text-xs uppercase text-[var(--muted)]">
-                {message.role}
+        <TabsContent value="conversation">
+          <div className="space-y-4">
+            {conversation.messages.map((message, index) => (
+              <div
+                key={index}
+                className={`message ${message.role === 'user' ? 'message-user' : 'message-agent'}`}
+              >
+                <div className="mb-1 text-xs font-medium uppercase opacity-70">
+                  {message.role}
+                </div>
+                <p>{message.content}</p>
               </div>
-              <p>{message.content}</p>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        </TabsContent>
 
-      {activeTab === 'insights' && (
-        <div className="space-y-4">
-          {!analysis ? (
-            <div className="card py-12 text-center">
-              <p className="mb-4 text-4xl">💡</p>
-              <p className="text-[var(--muted)]">
-                No analysis yet. Click &quot;Run Analysis&quot; to extract
-                insights.
-              </p>
-            </div>
-          ) : analysis.insights.length === 0 ? (
-            <div className="card py-12 text-center">
-              <p className="text-[var(--muted)]">
-                No insights were extracted. Make sure you have active insights
-                defined.
-              </p>
-              <Link href="/insights" className="btn btn-secondary mt-4">
-                Manage Insights
-              </Link>
-            </div>
-          ) : (
-            analysis.insights.map((insight, index) => (
-              <div key={index} className="card">
-                <div className="mb-3 flex items-start justify-between">
-                  <h3 className="font-semibold">{insight.insight_name}</h3>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[var(--muted)]">
-                      Confidence:
-                    </span>
-                    <div className="confidence-bar w-24">
-                      <div
-                        className="confidence-fill"
-                        style={{
-                          width: `${insight.confidence * 100}%`,
-                          background:
-                            insight.confidence > 0.7
-                              ? 'var(--secondary)'
-                              : insight.confidence > 0.4
-                                ? 'var(--warning)'
-                                : 'var(--danger)',
-                        }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium">
-                      {Math.round(insight.confidence * 100)}%
-                    </span>
+        <TabsContent value="insights">
+          <div className="space-y-4">
+            {!analysis ? (
+              <Card className="py-12 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-primary/10 p-4">
+                    <Lightbulb className="h-8 w-8 text-primary" />
                   </div>
                 </div>
-                <p className="text-[var(--foreground)]">{insight.value}</p>
-                {insight.evidence && (
-                  <div className="mt-3 rounded-lg border-l-2 border-[var(--primary)] bg-[var(--background)] p-3">
-                    <p className="text-sm italic text-[var(--muted)]">
-                      &quot;{insight.evidence}&quot;
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {activeTab === 'questions' && (
-        <div className="space-y-4">
-          {!analysis ? (
-            <div className="card py-12 text-center">
-              <p className="mb-4 text-4xl">❓</p>
-              <p className="text-[var(--muted)]">
-                No analysis yet. Click &quot;Run Analysis&quot; to check
-                qualifying questions.
-              </p>
-            </div>
-          ) : analysis.questions.length === 0 ? (
-            <div className="card py-12 text-center">
-              <p className="text-[var(--muted)]">
-                No questions were checked. Make sure you have active questions
-                defined.
-              </p>
-              <Link href="/questions" className="btn btn-secondary mt-4">
-                Manage Questions
-              </Link>
-            </div>
-          ) : (
-            analysis.questions.map((question, index) => (
-              <div key={index} className="card">
-                <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-semibold">{question.question_text}</h3>
-                  <span
-                    className={`badge ${question.answered ? 'badge-success' : 'badge-danger'}`}
-                  >
-                    {question.answered ? '✓ Answered' : '✗ Not Answered'}
-                  </span>
-                </div>
-                {question.answered && question.answer ? (
-                  <>
-                    <p className="font-medium text-[var(--foreground)]">
-                      {question.answer}
-                    </p>
-                    {question.evidence && (
-                      <div className="mt-3 rounded-lg border-l-2 border-[var(--secondary)] bg-[var(--background)] p-3">
-                        <p className="text-sm italic text-[var(--muted)]">
-                          &quot;{question.evidence}&quot;
-                        </p>
+                <p className="text-muted-foreground">
+                  No analysis yet. Click &quot;Run Analysis&quot; to extract
+                  insights.
+                </p>
+              </Card>
+            ) : analysis.insights.length === 0 ? (
+              <Card className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  No insights were extracted. Make sure you have active insights
+                  defined.
+                </p>
+                <Link href="/insights">
+                  <Button variant="outline" className="mt-4">
+                    Manage Insights
+                  </Button>
+                </Link>
+              </Card>
+            ) : (
+              analysis.insights.map((insight, index) => (
+                <Card key={index}>
+                  <div className="mb-3 flex items-start justify-between">
+                    <h3 className="font-semibold">{insight.insight_name}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Confidence:
+                      </span>
+                      <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${insight.confidence * 100}%`,
+                            backgroundColor:
+                              insight.confidence > 0.7
+                                ? 'rgb(var(--success))'
+                                : insight.confidence > 0.4
+                                  ? 'rgb(var(--warning))'
+                                  : 'rgb(var(--destructive))',
+                          }}
+                        />
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-[var(--muted)]">
-                    This question was not addressed in the conversation.
-                  </p>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      )}
+                      <span className="text-sm font-medium">
+                        {Math.round(insight.confidence * 100)}%
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-foreground">{insight.value}</p>
+                  {insight.evidence && (
+                    <div className="mt-3 rounded-lg border-l-2 border-primary bg-muted/50 p-3">
+                      <p className="text-sm italic text-muted-foreground">
+                        &quot;{insight.evidence}&quot;
+                      </p>
+                    </div>
+                  )}
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="questions">
+          <div className="space-y-4">
+            {!analysis ? (
+              <Card className="py-12 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-warning/10 p-4">
+                    <HelpCircle className="h-8 w-8 text-warning" />
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  No analysis yet. Click &quot;Run Analysis&quot; to check
+                  qualifying questions.
+                </p>
+              </Card>
+            ) : analysis.questions.length === 0 ? (
+              <Card className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  No questions were checked. Make sure you have active questions
+                  defined.
+                </p>
+                <Link href="/questions">
+                  <Button variant="outline" className="mt-4">
+                    Manage Questions
+                  </Button>
+                </Link>
+              </Card>
+            ) : (
+              analysis.questions.map((question, index) => (
+                <Card key={index}>
+                  <div className="mb-2 flex items-start justify-between">
+                    <h3 className="font-semibold">{question.question_text}</h3>
+                    <Badge variant={question.answered ? 'success' : 'destructive'}>
+                      {question.answered ? (
+                        <>
+                          <Check className="mr-1 h-3 w-3" />
+                          Answered
+                        </>
+                      ) : (
+                        <>
+                          <X className="mr-1 h-3 w-3" />
+                          Not Answered
+                        </>
+                      )}
+                    </Badge>
+                  </div>
+                  {question.answered && question.answer ? (
+                    <>
+                      <p className="font-medium text-foreground">
+                        {question.answer}
+                      </p>
+                      {question.evidence && (
+                        <div className="mt-3 rounded-lg border-l-2 border-success bg-muted/50 p-3">
+                          <p className="text-sm italic text-muted-foreground">
+                            &quot;{question.evidence}&quot;
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      This question was not addressed in the conversation.
+                    </p>
+                  )}
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

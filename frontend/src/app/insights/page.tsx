@@ -1,8 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Plus, Pencil, Trash2, Lightbulb } from 'lucide-react'
 import { insightsAPI } from '@/lib/api'
 import type { Insight, InsightCreate } from '@/lib/types'
+
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Spinner } from '@/components/ui/spinner'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function InsightsPage() {
   const [insights, setInsights] = useState<Insight[]>([])
@@ -88,7 +103,7 @@ export default function InsightsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="spinner" />
+        <Spinner size="lg" />
       </div>
     )
   }
@@ -98,148 +113,139 @@ export default function InsightsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Insights</h1>
-          <p className="mt-2 text-[var(--muted)]">
+          <p className="mt-2 text-muted-foreground">
             Define custom insights to extract from conversations
           </p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn btn-primary">
-          <span>+</span> Add Insight
-        </button>
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="h-4 w-4" />
+          Add Insight
+        </Button>
       </div>
 
       {error && (
-        <div className="card border-[var(--danger)]">
-          <p className="text-[var(--danger)]">{error}</p>
+        <Card className="border-destructive">
+          <p className="text-destructive">{error}</p>
           <button
             onClick={() => setError(null)}
-            className="mt-2 text-sm text-[var(--muted)] hover:underline"
+            className="mt-2 text-sm text-muted-foreground hover:underline"
           >
             Dismiss
           </button>
-        </div>
+        </Card>
       )}
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="card mx-4 w-full max-w-lg">
-            <h2 className="mb-4 text-xl font-semibold">
+      {/* Form Dialog */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
               {editingId ? 'Edit Insight' : 'New Insight'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  className="input"
-                  placeholder="e.g., User Sentiment"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Description
-                </label>
-                <textarea
-                  className="input"
-                  placeholder="Describe what insight to extract from conversations..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  className={`toggle ${formData.active ? 'active' : ''}`}
-                  onClick={() =>
-                    setFormData({ ...formData, active: !formData.active })
-                  }
-                />
-                <span className="text-sm">Active for analysis</span>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="btn btn-secondary flex-1"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary flex-1"
-                >
-                  {saving ? (
-                    <span className="spinner" />
-                  ) : editingId ? (
-                    'Update'
-                  ) : (
-                    'Create'
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium">Name</label>
+              <Input
+                placeholder="e.g., User Sentiment"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Description
+              </label>
+              <Textarea
+                placeholder="Describe what insight to extract from conversations..."
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={formData.active}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, active: checked })
+                }
+              />
+              <span className="text-sm">Active for analysis</span>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetForm}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving} className="flex-1">
+                {saving ? <Spinner size="sm" /> : editingId ? 'Update' : 'Create'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Insights List */}
       {insights.length === 0 ? (
-        <div className="card py-12 text-center">
-          <p className="mb-4 text-4xl">💡</p>
-          <p className="text-[var(--muted)]">No insights defined yet.</p>
-          <p className="mt-2 text-sm text-[var(--muted)]">
+        <Card className="py-12 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="rounded-full bg-primary/10 p-4">
+              <Lightbulb className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+          <p className="text-muted-foreground">No insights defined yet.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
             Add insights like &quot;User sentiment&quot;, &quot;Purchase
             intent&quot;, or &quot;Pain points&quot;
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4">
           {insights.map((insight) => (
-            <div key={insight.id} className="card">
+            <Card key={insight.id}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-lg font-semibold">{insight.name}</h3>
-                    <span
-                      className={`badge ${insight.active ? 'badge-success' : 'badge-neutral'}`}
-                    >
+                    <Badge variant={insight.active ? 'success' : 'outline'}>
                       {insight.active ? 'Active' : 'Inactive'}
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="mt-2 text-[var(--muted)]">
+                  <p className="mt-2 text-muted-foreground">
                     {insight.description}
                   </p>
                 </div>
                 <div className="ml-4 flex items-center gap-2">
-                  <button
-                    onClick={() => handleToggleActive(insight)}
-                    className={`toggle ${insight.active ? 'active' : ''}`}
-                    title={insight.active ? 'Deactivate' : 'Activate'}
+                  <Switch
+                    checked={insight.active}
+                    onCheckedChange={() => handleToggleActive(insight)}
                   />
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => startEdit(insight)}
-                    className="btn btn-secondary"
                   >
-                    Edit
-                  </button>
-                  <button
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={() => handleDelete(insight.id)}
-                    className="btn btn-danger"
                   >
-                    Delete
-                  </button>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

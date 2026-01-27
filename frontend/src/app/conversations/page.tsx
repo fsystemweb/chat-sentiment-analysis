@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { MessageSquare, Calendar, ArrowRight, CheckCircle, Clock } from 'lucide-react'
 import { conversationsAPI } from '@/lib/api'
 import type { ConversationSummary } from '@/lib/types'
+
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 export default function ConversationsPage() {
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'analyzed' | 'pending'>('all')
 
   useEffect(() => {
     loadConversations()
@@ -28,16 +33,13 @@ export default function ConversationsPage() {
     }
   }
 
-  const filteredConversations = conversations.filter((conv) => {
-    if (filter === 'analyzed') return conv.has_analysis
-    if (filter === 'pending') return !conv.has_analysis
-    return true
-  })
+  const analyzedConversations = conversations.filter((c) => c.has_analysis)
+  const pendingConversations = conversations.filter((c) => !c.has_analysis)
 
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="spinner" />
+        <Spinner size="lg" />
       </div>
     )
   }
@@ -47,88 +49,106 @@ export default function ConversationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Conversations</h1>
-          <p className="mt-2 text-[var(--muted)]">
+          <p className="mt-2 text-muted-foreground">
             View and analyze your conversations
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="card border-[var(--danger)]">
-          <p className="text-[var(--danger)]">{error}</p>
-        </div>
+        <Card className="border-destructive">
+          <p className="text-destructive">{error}</p>
+        </Card>
       )}
 
       {/* Filter Tabs */}
-      <div className="flex gap-2">
-        {(['all', 'analyzed', 'pending'] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
-              filter === f
-                ? 'bg-[var(--primary)] text-white'
-                : 'bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            {f === 'all' && `All (${conversations.length})`}
-            {f === 'analyzed' &&
-              `Analyzed (${conversations.filter((c) => c.has_analysis).length})`}
-            {f === 'pending' &&
-              `Pending (${conversations.filter((c) => !c.has_analysis).length})`}
-          </button>
-        ))}
-      </div>
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">
+            All ({conversations.length})
+          </TabsTrigger>
+          <TabsTrigger value="analyzed">
+            <CheckCircle className="mr-1 h-4 w-4" />
+            Analyzed ({analyzedConversations.length})
+          </TabsTrigger>
+          <TabsTrigger value="pending">
+            <Clock className="mr-1 h-4 w-4" />
+            Pending ({pendingConversations.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Conversations List */}
-      {filteredConversations.length === 0 ? (
-        <div className="card py-12 text-center">
-          <p className="mb-4 text-4xl">💬</p>
-          <p className="text-[var(--muted)]">No conversations found.</p>
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            Add conversation files to the backend/data/conversations directory
-          </p>
+        <TabsContent value="all">
+          <ConversationList conversations={conversations} />
+        </TabsContent>
+        <TabsContent value="analyzed">
+          <ConversationList conversations={analyzedConversations} />
+        </TabsContent>
+        <TabsContent value="pending">
+          <ConversationList conversations={pendingConversations} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+function ConversationList({ conversations }: { conversations: ConversationSummary[] }) {
+  if (conversations.length === 0) {
+    return (
+      <Card className="py-12 text-center">
+        <div className="mb-4 flex justify-center">
+          <div className="rounded-full bg-primary/10 p-4">
+            <MessageSquare className="h-8 w-8 text-primary" />
+          </div>
         </div>
-      ) : (
-        <div className="grid gap-4">
-          {filteredConversations.map((conv) => (
-            <Link key={conv.id} href={`/conversations/${conv.id}`}>
-              <div className="card group cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold transition-colors group-hover:text-[var(--primary)]">
-                      {conv.title}
-                    </h3>
-                    <div className="mt-2 flex items-center gap-4 text-sm text-[var(--muted)]">
-                      <span>💬 {conv.message_count} messages</span>
-                      {conv.source && (
-                        <span className="badge badge-primary">
-                          {conv.source}
-                        </span>
-                      )}
-                      {conv.date && (
-                        <span>
-                          📅 {new Date(conv.date).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {conv.has_analysis ? (
-                      <span className="badge badge-success">✓ Analyzed</span>
-                    ) : (
-                      <span className="badge badge-warning">Pending</span>
-                    )}
-                    <span className="text-[var(--muted)] transition-colors group-hover:text-[var(--primary)]">
-                      →
+        <p className="text-muted-foreground">No conversations found.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Add conversation files to the backend/data/conversations directory
+        </p>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="grid gap-4">
+      {conversations.map((conv) => (
+        <Link key={conv.id} href={`/conversations/${conv.id}`}>
+          <Card className="group cursor-pointer hover:border-primary">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+                  {conv.title}
+                </h3>
+                <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="inline-flex items-center gap-1">
+                    <MessageSquare className="h-4 w-4" />
+                    {conv.message_count} messages
+                  </span>
+                  {conv.source && (
+                    <Badge variant="default">{conv.source}</Badge>
+                  )}
+                  {conv.date && (
+                    <span className="inline-flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(conv.date).toLocaleDateString()}
                     </span>
-                  </div>
+                  )}
                 </div>
               </div>
-            </Link>
-          ))}
-        </div>
-      )}
+              <div className="flex items-center gap-3">
+                {conv.has_analysis ? (
+                  <Badge variant="success">
+                    <CheckCircle className="mr-1 h-3 w-3" />
+                    Analyzed
+                  </Badge>
+                ) : (
+                  <Badge variant="warning">Pending</Badge>
+                )}
+                <ArrowRight className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" />
+              </div>
+            </div>
+          </Card>
+        </Link>
+      ))}
     </div>
   )
 }
