@@ -1,0 +1,24 @@
+{
+  "id": "conv-123",
+  "metadata": {
+    "title": "Test Conversation",
+    "source": "web",
+    "date": null,
+    "participants": [
+      "user-456"
+    ],
+    "tags": []
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello, I need help with my project.",
+      "timestamp": "2026-01-28 06:50:24.271241"
+    },
+    {
+      "role": "assistant",
+      "content": "I'd be happy to help! What kind of project are you working on?",
+      "timestamp": "2026-01-28 06:50:24.271251"
+    }
+  ]
+}

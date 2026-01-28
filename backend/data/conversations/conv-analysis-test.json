@@ -1,0 +1,27 @@
+{
+  "id": "conv-analysis-test",
+  "metadata": {
+    "title": "Analysis Test Conversation",
+    "source": "sales_call",
+    "date": null,
+    "participants": [],
+    "tags": []
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "I'm looking for a CRM solution. Our budget is around $50k.",
+      "timestamp": "2026-01-28 06:50:23.639666"
+    },
+    {
+      "role": "assistant",
+      "content": "Great! I can help you find the right CRM. What's your timeline?",
+      "timestamp": "2026-01-28 06:50:23.639683"
+    },
+    {
+      "role": "user",
+      "content": "We need to implement it within 3 months.",
+      "timestamp": "2026-01-28 06:50:23.639689"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "conv-test",
+  "metadata": {
+    "title": "Test Conversation",
+    "source": null,
+    "date": null,
+    "participants": [],
+    "tags": []
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "Test message",
+      "timestamp": "2026-01-28 06:50:24.613376"
+    }
+  ]
+}

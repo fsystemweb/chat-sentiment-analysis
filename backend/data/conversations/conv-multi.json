@@ -1,0 +1,32 @@
+{
+  "id": "conv-multi",
+  "metadata": {
+    "title": "Multi-message Conversation",
+    "source": null,
+    "date": null,
+    "participants": [],
+    "tags": []
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "Message 1",
+      "timestamp": "2026-01-28 06:50:24.624181"
+    },
+    {
+      "role": "assistant",
+      "content": "Response 1",
+      "timestamp": "2026-01-28 06:50:24.624190"
+    },
+    {
+      "role": "user",
+      "content": "Message 2",
+      "timestamp": "2026-01-28 06:50:24.624194"
+    },
+    {
+      "role": "assistant",
+      "content": "Response 2",
+      "timestamp": "2026-01-28 06:50:24.624197"
+    }
+  ]
+}
