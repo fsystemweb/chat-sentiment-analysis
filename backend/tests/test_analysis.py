@@ -1,8 +1,9 @@
 """Tests for analysis API endpoints."""
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch, AsyncMock
+from app.models.analysis import ConversationAnalysis
 
 
 @pytest.fixture
@@ -15,17 +16,17 @@ def sample_conversation(client):
             {
                 "role": "user",
                 "content": "I'm looking for a CRM solution. Our budget is around $50k.",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             {
                 "role": "assistant",
                 "content": "Great! I can help you find the right CRM. What's your timeline?",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             {
                 "role": "user",
                 "content": "We need to implement it within 3 months.",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             }
         ]
     }
@@ -56,8 +57,8 @@ def sample_insights(client):
 def sample_questions(client):
     """Create sample questions for testing."""
     questions = [
-        {"text": "What is the customer's budget?", "is_active": True},
-        {"text": "What is the implementation timeline?", "is_active": True}
+        {"question": "What is the customer's budget?", "is_active": True},
+        {"question": "What is the implementation timeline?", "is_active": True}
     ]
     
     question_ids = []
@@ -82,16 +83,17 @@ def test_get_analysis_not_found(client):
     response = client.get("/api/analysis/non-existent-conv")
     
     assert response.status_code == 404
-    assert "not found" in response.json()["detail"].lower()
+    assert response.json()["detail"] == "No analysis found for conversation 'non-existent-conv'"
 
 
-@patch('app.agent.chains.AnalysisChain.analyze_conversation')
+@patch('app.agent.chains.AnalysisChain.analyze_conversation', new_callable=AsyncMock)
 def test_run_analysis(mock_analyze, client, sample_conversation, sample_insights, sample_questions):
     """Test running analysis on a conversation."""
     # Mock the analysis chain response
-    mock_result = {
-        "conversation_id": sample_conversation,
-        "insights": [
+    mock_result = ConversationAnalysis(
+        id="test-analysis-id",
+        conversation_id=sample_conversation,
+        insights=[
             {
                 "insight_id": sample_insights[0],
                 "insight_name": "Budget",
@@ -100,7 +102,7 @@ def test_run_analysis(mock_analyze, client, sample_conversation, sample_insights
                 "evidence": "User mentioned budget is around $50k"
             }
         ],
-        "questions": [
+        questions=[
             {
                 "question_id": sample_questions[0],
                 "question_text": "What is the customer's budget?",
@@ -109,10 +111,10 @@ def test_run_analysis(mock_analyze, client, sample_conversation, sample_insights
                 "confidence": 0.95
             }
         ],
-        "analyzed_at": datetime.utcnow()
-    }
-    
-    mock_analyze.return_value = AsyncMock(return_value=mock_result)
+        summary="Test summary",
+        analyzed_at=datetime.now(timezone.utc)
+    )
+    mock_analyze.return_value = mock_result
     
     # Run analysis
     analysis_request = {
@@ -144,17 +146,19 @@ def test_run_analysis_conversation_not_found(client):
     assert "not found" in response.json()["detail"].lower()
 
 
-@patch('app.agent.chains.AnalysisChain.analyze_conversation')
+@patch('app.agent.chains.AnalysisChain.analyze_conversation', new_callable=AsyncMock)
 def test_get_analysis_after_creation(mock_analyze, client, sample_conversation, sample_insights):
     """Test retrieving analysis after it's been created."""
     # Mock the analysis
-    mock_result = {
-        "conversation_id": sample_conversation,
-        "insights": [],
-        "questions": [],
-        "analyzed_at": datetime.utcnow()
-    }
-    mock_analyze.return_value = AsyncMock(return_value=mock_result)
+    mock_result = ConversationAnalysis(
+        id="test-analysis-id",
+        conversation_id=sample_conversation,
+        insights=[],
+        questions=[],
+        summary="Test summary",
+        analyzed_at=datetime.now(timezone.utc)
+    )
+    mock_analyze.return_value = mock_result
     
     # Create analysis
     analysis_request = {
@@ -184,7 +188,7 @@ def test_aggregate_analysis_empty(client):
     assert data["question_summaries"] == {}
 
 
-@patch('app.agent.chains.AnalysisChain.analyze_conversation')
+@patch('app.agent.chains.AnalysisChain.analyze_conversation', new_callable=AsyncMock)
 def test_aggregate_analysis_with_data(mock_analyze, client, sample_conversation, sample_insights, sample_questions):
     """Test aggregate analysis with existing data."""
     # Create some conversations and analyses
@@ -194,17 +198,18 @@ def test_aggregate_analysis_with_data(mock_analyze, client, sample_conversation,
             "id": f"conv-agg-{i}",
             "metadata": {"title": f"Aggregate Test {i}"},
             "messages": [
-                {"role": "user", "content": f"Message {i}", "timestamp": datetime.utcnow().isoformat()}
+                {"role": "user", "content": f"Message {i}", "timestamp": datetime.now(timezone.utc).isoformat()}
             ]
         }
         client.post("/api/conversations", json=conv_data)
         conv_ids.append(conv_data["id"])
     
     # Mock analysis results
-    def mock_analysis_func(conversation, insight_ids=None, question_ids=None):
-        return {
-            "conversation_id": conversation.id,
-            "insights": [
+    async def mock_analysis_func(conversation, insight_ids=None, question_ids=None):
+        return ConversationAnalysis(
+            id=f"test-analysis-{conversation.id}",
+            conversation_id=conversation.id,
+            insights=[
                 {
                     "insight_id": sample_insights[0],
                     "insight_name": "Budget",
@@ -213,9 +218,10 @@ def test_aggregate_analysis_with_data(mock_analyze, client, sample_conversation,
                     "evidence": "Test"
                 }
             ],
-            "questions": [],
-            "analyzed_at": datetime.utcnow()
-        }
+            questions=[],
+            summary="Test summary",
+            analyzed_at=datetime.now(timezone.utc)
+        )
     
     mock_analyze.side_effect = mock_analysis_func
     
@@ -233,7 +239,7 @@ def test_aggregate_analysis_with_data(mock_analyze, client, sample_conversation,
     
     assert response.status_code == 200
     data = response.json()
-    assert data["total_conversations"] == 3
+    assert data["total_conversations"] == 4
     assert data["analyzed_conversations"] == 2
     assert "Budget" in data["insight_summaries"]
 

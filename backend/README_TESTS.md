@@ -17,14 +17,6 @@ tests/
 
 ## Running Tests
 
-### Install Test Dependencies
-
-First, make sure you have pytest and required dependencies installed:
-
-```bash
-pip install pytest pytest-asyncio httpx
-```
-
 ### Run All Tests
 
 ```bash
