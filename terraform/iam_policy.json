@@ -10,9 +10,11 @@
                 "ec2:StartInstances",
                 "ec2:DescribeInstances",
                 "ec2:DescribeInstanceStatus",
+                "ec2:DescribeInstanceAttribute",
                 "ec2:ModifyInstanceAttribute",
                 "ec2:CreateTags",
-                "ec2:DeleteTags"
+                "ec2:DeleteTags",
+                "ec2:DescribeTags"
             ],
             "Resource": "*"
         },
@@ -23,6 +25,16 @@
                 "ec2:DeleteVpc",
                 "ec2:DescribeVpcs",
                 "ec2:ModifyVpcAttribute",
+                "ec2:ModifySubnetAttribute",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:CreateNetworkInterface",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DetachNetworkInterface",
+                "ec2:AttachNetworkInterface",
+                "ec2:ModifyNetworkInterfaceAttribute",
+                "ec2:CreateKeyPair",
+                "ec2:DeleteKeyPair",
+                "ec2:ImportKeyPair",
                 "ec2:CreateSubnet",
                 "ec2:DeleteSubnet",
                 "ec2:DescribeSubnets",
@@ -57,10 +69,7 @@
         {
             "Effect": "Allow",
             "Action": [
-                "ec2:DescribeImages",
-                "ec2:DescribeKeyPairs",
-                "ec2:DescribeAvailabilityZones",
-                "ec2:DescribeVpcAttribute"
+                "ec2:Describe*"
             ],
             "Resource": "*"
         }
