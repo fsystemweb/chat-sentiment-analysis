@@ -91,5 +91,36 @@
       }
     ],
     "summary": "The conversation is between Sarah from TechSolutions and John, the VP of Engineering at a mid-sized company. They discuss the company's current project management tool issues and potential solutions offered by TechSolutions. John expresses interest in a trial of the TechSolutions platform, pending final approval from their CTO."
+  },
+  {
+    "id": "81fda094-b0b1-43f9-b69f-82c901b7ad1c",
+    "conversation_id": "test_conversation_no_analysis",
+    "analyzed_at": "2026-01-28 06:32:46.741074",
+    "insights": [
+      {
+        "insight_id": "485a96d4-3350-4b6b-bcfc-10b2638edcb6",
+        "insight_name": "User sentiment",
+        "value": "Neutral",
+        "confidence": 0.7,
+        "evidence": "I'm just testing the system."
+      },
+      {
+        "insight_id": "53ebcd82-2eac-4028-9d49-a442686e7982",
+        "insight_name": "Paint points",
+        "value": "No pain points identified",
+        "confidence": 0.0,
+        "evidence": "The user did not express any problems or issues."
+      }
+    ],
+    "questions": [
+      {
+        "question_id": "18f3aa97-2350-4044-abee-ac0f791dbf6c",
+        "question_text": "How big is the company?",
+        "answered": false,
+        "answer": null,
+        "evidence": null
+      }
+    ],
+    "summary": "The customer is testing the system and the agent offers assistance if needed. No specific issues or concerns were raised during this brief interaction."
   }
 ]

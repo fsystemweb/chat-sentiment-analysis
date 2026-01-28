@@ -25,13 +25,13 @@
     --accent: #F1F5F9;
     --accent-foreground: #1E293B;
 
-    --success: #10B981;
+    --success: 16 185 129;
     --success-foreground: #FFFFFF;
 
-    --warning: #F59E0B;
+    --warning: 245 158 11;
     --warning-foreground: #FFFFFF;
 
-    --destructive: #EF4444;
+    --destructive: 239 68 68;
     --destructive-foreground: #FFFFFF;
 
     --border: #E2E8F0;

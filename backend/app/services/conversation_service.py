@@ -6,6 +6,8 @@ from typing import List, Optional
 
 from app.config import get_settings
 from app.models.conversation import Conversation, ConversationSummary, ConversationMetadata, Message
+from app.models.analysis import ConversationAnalysis
+from app.services.storage_service import StorageService
 
 
 class ConversationService:
@@ -44,12 +46,21 @@ class ConversationService:
                 conversations.append(conv)
         return sorted(conversations, key=lambda c: c.metadata.date or "", reverse=True)
     
-    async def get_all_summaries(self, analysis_results: dict = None) -> List[ConversationSummary]:
-        """Get summaries of all conversations."""
+    async def get_all_summaries(self) -> List[ConversationSummary]:
+        """Get summaries of all conversations with dynamic has_analysis computation."""
         conversations = await self.get_all()
+        
+        # Load all analysis results once for efficiency
+        settings = get_settings()
+        analysis_storage = StorageService(settings.analysis_results_file, ConversationAnalysis)
+        all_analysis_results = await analysis_storage.get_all()
+        
+        # Create a set of conversation IDs that have analysis for O(1) lookup
+        analyzed_conversation_ids = {result.conversation_id for result in all_analysis_results}
+        
         summaries = []
         for conv in conversations:
-            has_analysis = analysis_results and conv.id in analysis_results if analysis_results else False
+            has_analysis = conv.id in analyzed_conversation_ids
             summaries.append(ConversationSummary(
                 id=conv.id,
                 title=conv.metadata.title,

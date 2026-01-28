@@ -48,4 +48,4 @@ class ConversationSummary(BaseModel):
     source: Optional[str] = None
     date: Optional[datetime] = None
     message_count: int
-    has_analysis: bool = False
+    has_analysis: bool

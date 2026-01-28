@@ -22,15 +22,15 @@ module.exports = {
           foreground: 'var(--secondary-foreground)',
         },
         destructive: {
-          DEFAULT: 'var(--destructive)',
+          DEFAULT: 'rgb(var(--destructive))',
           foreground: 'var(--destructive-foreground)',
         },
         success: {
-          DEFAULT: 'var(--success)',
+          DEFAULT: 'rgb(var(--success))',
           foreground: 'var(--success-foreground)',
         },
         warning: {
-          DEFAULT: 'var(--warning)',
+          DEFAULT: 'rgb(var(--warning))',
           foreground: 'var(--warning-foreground)',
         },
         muted: {
