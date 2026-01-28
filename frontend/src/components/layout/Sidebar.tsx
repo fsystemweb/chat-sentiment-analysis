@@ -27,7 +27,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-border bg-card">
       <div className="border-b border-border p-6">
-        <h1 className="bg-gradient-to-r from-primary to-success bg-clip-text text-xl font-bold text-transparent">
+        <h1 className="text-primary text-xl font-bold">
           Conversation Insights
         </h1>
         <p className="mt-1 text-xs text-muted-foreground">AI-Powered Analysis</p>
