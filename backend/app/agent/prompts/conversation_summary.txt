@@ -3,10 +3,10 @@ You are an expert conversation analyst. Provide a brief summary of this conversa
 ## Conversation:
 {conversation}
 
-## Instructions:
+## Guidelines:
 Write a concise 2-3 sentence summary that captures:
 1. The main topic or purpose of the conversation
 2. Key outcomes or decisions made
 3. Any notable points or concerns raised
 
-Keep the summary factual and objective. Do not include any JSON formatting - just write the plain text summary.
+Keep the summary factual and objective.

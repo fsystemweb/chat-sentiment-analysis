@@ -1,6 +1,5 @@
 """Analysis chains and utilities for conversation analysis."""
 
-import json
 import uuid
 from typing import List, Optional
 from datetime import datetime
@@ -43,40 +42,7 @@ class AnalysisChain:
             lines.append("")
         return "\n".join(lines)
     
-    def _parse_insight_results(self, llm_response: str) -> List[InsightResult]:
-        """Parse LLM response into InsightResult objects."""
-        try:
-            # Try to extract JSON from the response
-            response = llm_response.strip()
-            if response.startswith("```json"):
-                response = response[7:]
-            if response.startswith("```"):
-                response = response[3:]
-            if response.endswith("```"):
-                response = response[:-3]
-            
-            data = json.loads(response.strip())
-            return [InsightResult(**item) for item in data]
-        except Exception as e:
-            print(f"Error parsing insight results: {e}")
-            return []
-    
-    def _parse_question_results(self, llm_response: str) -> List[QuestionResult]:
-        """Parse LLM response into QuestionResult objects."""
-        try:
-            response = llm_response.strip()
-            if response.startswith("```json"):
-                response = response[7:]
-            if response.startswith("```"):
-                response = response[3:]
-            if response.endswith("```"):
-                response = response[:-3]
-            
-            data = json.loads(response.strip())
-            return [QuestionResult(**item) for item in data]
-        except Exception as e:
-            print(f"Error parsing question results: {e}")
-            return []
+
     
     async def analyze_conversation(
         self,
@@ -106,17 +72,37 @@ class AnalysisChain:
         insight_results = []
         if insights:
             insights_text = self._format_insights_for_prompt(insights)
-            llm_response = await self.orchestrator.extract_insights(conversation_text, insights_text)
-            insight_results = self._parse_insight_results(llm_response)
+            structured_insights = await self.orchestrator.extract_insights(conversation_text, insights_text)
+            # Convert structured output items to domain models
+            insight_results = [
+                InsightResult(
+                    insight_id=item.insight_id,
+                    insight_name=item.insight_name,
+                    value=item.value,
+                    confidence=item.confidence,
+                    evidence=item.evidence
+                )
+                for item in structured_insights
+            ]
         
         # Answer questions
         question_results = []
         if questions:
             questions_text = self._format_questions_for_prompt(questions)
-            llm_response = await self.orchestrator.answer_questions(conversation_text, questions_text)
-            question_results = self._parse_question_results(llm_response)
+            structured_questions = await self.orchestrator.answer_questions(conversation_text, questions_text)
+            # Convert structured output items to domain models
+            question_results = [
+                QuestionResult(
+                    question_id=item.question_id,
+                    question_text=item.question_text,
+                    answered=item.answered,
+                    answer=item.answer,
+                    evidence=None  # Not provided in structured output
+                )
+                for item in structured_questions
+            ]
         
-        # Generate summary
+        # Generate summary (already returns string)
         summary = await self.orchestrator.generate_summary(conversation_text)
         
         return ConversationAnalysis(

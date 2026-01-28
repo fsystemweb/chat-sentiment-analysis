@@ -6,26 +6,8 @@ You are an expert conversation analyst. Your task is to find answers to qualifyi
 ## Questions to Answer:
 {questions}
 
-## Instructions:
-For each question listed above, search the conversation to find if and how it was answered.
-
-Return your analysis as a JSON array with the following structure for each question:
-```json
-[
-  {
-    "question_id": "<the question ID>",
-    "question_text": "<the question text>",
-    "answered": <true/false - whether the question was answered>,
-    "answer": "<the extracted answer if found, or null if not answered>",
-    "evidence": "<direct quote from the conversation containing the answer, or null if not found>"
-  }
-]
-```
-
 ## Guidelines:
 - A question is "answered" if the conversation contains information that directly addresses it
 - The answer should be the specific response or information found, not your interpretation
-- Include the relevant quote from the conversation as evidence
-- If the question was not addressed in the conversation, set answered to false and answer to null
-
-Return ONLY the JSON array, no additional text.
+- Include a confidence score (0.0 to 1.0) for how certain you are about the answer
+- If the question was not addressed in the conversation, set answered to false, answer to null, and confidence to null

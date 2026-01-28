@@ -1,7 +1,9 @@
 """Analysis API routes."""
 
-import json
+import time
+from datetime import datetime
 from typing import List, Optional
+
 from fastapi import APIRouter, HTTPException, status
 
 from app.config import get_settings
@@ -11,6 +13,35 @@ from app.agent.chains import get_analysis_chain
 from app.services.storage_service import StorageService
 
 router = APIRouter()
+
+
+# Simple in-memory cache for aggregate analysis
+class AggregateCache:
+    """TTL-based cache for aggregate analysis results."""
+    
+    def __init__(self, ttl_seconds: int = 60):
+        self.ttl_seconds = ttl_seconds
+        self._cache: Optional[AggregateAnalysis] = None
+        self._cached_at: float = 0
+    
+    def get(self) -> Optional[AggregateAnalysis]:
+        """Get cached value if still valid."""
+        if self._cache and (time.time() - self._cached_at) < self.ttl_seconds:
+            return self._cache
+        return None
+    
+    def set(self, value: AggregateAnalysis) -> None:
+        """Cache a new value."""
+        self._cache = value
+        self._cached_at = time.time()
+    
+    def invalidate(self) -> None:
+        """Clear the cache."""
+        self._cache = None
+        self._cached_at = 0
+
+
+_aggregate_cache = AggregateCache(ttl_seconds=60)
 
 
 async def _get_analysis_storage() -> StorageService:
@@ -46,42 +77,23 @@ async def run_analysis(request: AnalysisRequest):
             detail=f"Analysis failed: {str(e)}"
         )
     
-    # Store the result
+    # Store the result and invalidate aggregate cache
     storage = await _get_analysis_storage()
     await storage.create(result)
+    _aggregate_cache.invalidate()
     
     return result
 
 
-@router.get("/analysis/{conversation_id}", response_model=Optional[ConversationAnalysis])
-async def get_analysis(conversation_id: str):
-    """Get the latest analysis for a conversation."""
-    storage = await _get_analysis_storage()
-    all_results = await storage.get_all()
-    
-    # Find the latest analysis for this conversation
-    results_for_conv = [r for r in all_results if r.conversation_id == conversation_id]
-    if not results_for_conv:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No analysis found for conversation '{conversation_id}'"
-        )
-    
-    # Return the most recent
-    return max(results_for_conv, key=lambda r: r.analyzed_at)
-
-
-@router.get("/analysis", response_model=List[ConversationAnalysis])
-async def list_all_analyses():
-    """Get all analysis results."""
-    storage = await _get_analysis_storage()
-    return await storage.get_all()
-
-
+# NOTE: /analysis/aggregate MUST be defined before /analysis/{conversation_id}
+# to prevent FastAPI from matching "aggregate" as a conversation_id
 @router.get("/analysis/aggregate", response_model=AggregateAnalysis)
 async def get_aggregate_analysis():
-    """Get aggregate analysis across all conversations."""
-    from datetime import datetime
+    """Get aggregate analysis across all conversations (cached for 60s)."""
+    # Check cache first
+    cached = _aggregate_cache.get()
+    if cached:
+        return cached
     
     storage = await _get_analysis_storage()
     all_results = await storage.get_all()
@@ -129,10 +141,40 @@ async def get_aggregate_analysis():
         if data["total_extractions"] > 0:
             data["avg_confidence"] /= data["total_extractions"]
     
-    return AggregateAnalysis(
+    aggregate = AggregateAnalysis(
         total_conversations=len(all_conversations),
         analyzed_conversations=len(set(r.conversation_id for r in all_results)),
         insight_summaries=insight_summaries,
         question_summaries=question_summaries,
         generated_at=datetime.utcnow()
     )
+    
+    # Cache the result
+    _aggregate_cache.set(aggregate)
+    
+    return aggregate
+
+
+@router.get("/analysis/{conversation_id}", response_model=Optional[ConversationAnalysis])
+async def get_analysis(conversation_id: str):
+    """Get the latest analysis for a conversation."""
+    storage = await _get_analysis_storage()
+    all_results = await storage.get_all()
+    
+    # Find the latest analysis for this conversation
+    results_for_conv = [r for r in all_results if r.conversation_id == conversation_id]
+    if not results_for_conv:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No analysis found for conversation '{conversation_id}'"
+        )
+    
+    # Return the most recent
+    return max(results_for_conv, key=lambda r: r.analyzed_at)
+
+
+@router.get("/analysis", response_model=List[ConversationAnalysis])
+async def list_all_analyses():
+    """Get all analysis results."""
+    storage = await _get_analysis_storage()
+    return await storage.get_all()
