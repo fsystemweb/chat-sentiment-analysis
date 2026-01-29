@@ -1,0 +1,13 @@
+# Example Terraform variables file
+# Copy to terraform.tfvars and fill in your values
+
+# Required
+openai_api_key = "sk-your-openai-api-key"
+
+# Optional (defaults shown)
+# project_name     = "agent-assistant"
+# aws_region       = "us-east-1"
+# container_cpu    = 256
+# container_memory = 512
+# desired_count    = 1
+# openai_model     = "gpt-4"
