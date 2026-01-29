@@ -74,7 +74,9 @@
         "ecr:CompleteLayerUpload",
         "ecr:TagResource",
         "ecr:UntagResource",
-        "ecr:ListTagsForResource"
+        "ecr:ListTagsForResource",
+        "ecr:BatchDeleteImage",
+        "ecr:ListImages"
       ],
       "Resource": "*"
     },
@@ -140,7 +142,8 @@
         "iam:GetInstanceProfile",
         "iam:TagRole",
         "iam:UntagRole",
-        "iam:GetRolePolicy"
+        "iam:GetRolePolicy",
+        "iam:ListInstanceProfilesForRole"
       ],
       "Resource": "*"
     }
