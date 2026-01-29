@@ -70,7 +70,7 @@ export default function Dashboard() {
       <Card className="border-destructive">
         <p className="text-destructive">Error: {error}</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Make sure the backend server is running at http://localhost:8000
+          Make sure the backend server is running and accessible.
         </p>
       </Card>
     )

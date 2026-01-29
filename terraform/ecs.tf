@@ -70,6 +70,10 @@ resource "aws_ecs_task_definition" "backend" {
         {
           name  = "DATA_DIR"
           value = "./data"
+        },
+        {
+          name  = "CORS_ORIGINS"
+          value = "http://${aws_lb.main.dns_name}"
         }
       ]
 
