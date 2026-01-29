@@ -4,8 +4,8 @@ An AI-powered assistant application built with **FastAPI** (backend) and **Next.
 
 ## 🌐 Live Demo
 
-- **Application**: http://agent-assistant-alb-424085493.us-east-1.elb.amazonaws.com/
-- **API Documentation (Swagger)**: http://agent-assistant-alb-424085493.us-east-1.elb.amazonaws.com/docs
+- **Application**: http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/
+- **API Documentation (Swagger)**: http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/docs
 
 ## 📋 Prerequisites
 

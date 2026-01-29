@@ -34,6 +34,11 @@ terraform apply
 ```
 
 ### 2. Build and Push Container Images
+User deploy.sh
+```bash
+./deploy.sh
+```
+Or
 
 ```bash
 # Get ECR repository URLs from Terraform output
