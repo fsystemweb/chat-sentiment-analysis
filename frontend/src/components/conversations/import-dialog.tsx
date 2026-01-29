@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, DragEvent } from 'react'
 import { Upload, FileJson, AlertCircle, CheckCircle } from 'lucide-react'
 import {
     Dialog,
@@ -30,6 +30,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
     const [error, setError] = useState<string | null>(null)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [importedTitle, setImportedTitle] = useState<string>('')
+    const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const resetState = () => {
@@ -37,6 +38,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
         setError(null)
         setSelectedFile(null)
         setImportedTitle('')
+        setIsDragging(false)
         if (fileInputRef.current) {
             fileInputRef.current.value = ''
         }
@@ -49,10 +51,7 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
         onOpenChange(isOpen)
     }
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
+    const validateAndSetFile = (file: File) => {
         setError(null)
         setState('idle')
 
@@ -69,6 +68,36 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
         }
 
         setSelectedFile(file)
+    }
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            validateAndSetFile(file)
+        }
+    }
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(true)
+    }
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(false)
+    }
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(false)
+
+        const file = e.dataTransfer.files?.[0]
+        if (file) {
+            validateAndSetFile(file)
+        }
     }
 
     const handleImport = async () => {
@@ -127,14 +156,21 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
                         </div>
                     ) : (
                         <>
-                            {/* File input */}
+                            {/* File input with drag and drop */}
                             <div
                                 className={`
-                  relative flex cursor-pointer flex-col items-center justify-center
-                  rounded-lg border-2 border-dashed p-8 transition-colors
-                  ${selectedFile ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
-                `}
+                                    relative flex cursor-pointer flex-col items-center justify-center
+                                    rounded-lg border-2 border-dashed p-8 transition-colors
+                                    ${isDragging
+                                        ? 'border-primary bg-primary/10'
+                                        : selectedFile
+                                            ? 'border-primary bg-primary/5'
+                                            : 'border-border hover:border-primary/50'}
+                                `}
                                 onClick={() => fileInputRef.current?.click()}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
                             >
                                 <input
                                     ref={fileInputRef}
@@ -154,9 +190,9 @@ export function ImportDialog({ open, onOpenChange, onSuccess }: ImportDialogProp
                                     </>
                                 ) : (
                                     <>
-                                        <Upload className="mb-2 h-10 w-10 text-muted-foreground" />
-                                        <p className="text-sm text-muted-foreground">
-                                            Click to select a JSON file
+                                        <Upload className={`mb-2 h-10 w-10 ${isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
+                                        <p className={`text-sm ${isDragging ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                                            {isDragging ? 'Drop file here' : 'Drag and drop or click to select'}
                                         </p>
                                     </>
                                 )}
