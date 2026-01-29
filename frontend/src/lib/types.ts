@@ -130,3 +130,14 @@ export interface AnalysisRequest {
   insight_ids?: string[]
   question_ids?: string[]
 }
+
+// Notification types
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'loading'
+
+export interface Notification {
+  id: string
+  type: NotificationType
+  title: string
+  message?: string
+  duration?: number // in ms, undefined = persistent
+}

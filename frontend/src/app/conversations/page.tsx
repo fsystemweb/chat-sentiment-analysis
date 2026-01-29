@@ -2,19 +2,22 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { MessageSquare, Calendar, ArrowRight, CheckCircle, Clock } from 'lucide-react'
+import { MessageSquare, Calendar, ArrowRight, CheckCircle, Clock, Upload } from 'lucide-react'
 import { conversationsAPI } from '@/lib/api'
 import type { ConversationSummary } from '@/lib/types'
 
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { ImportDialog } from '@/components/conversations/import-dialog'
 
 export default function ConversationsPage() {
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
 
   useEffect(() => {
     loadConversations()
@@ -53,7 +56,17 @@ export default function ConversationsPage() {
             View and analyze your conversations
           </p>
         </div>
+        <Button onClick={() => setImportDialogOpen(true)}>
+          <Upload className="mr-2 h-4 w-4" />
+          Import Conversation
+        </Button>
       </div>
+
+      <ImportDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onSuccess={loadConversations}
+      />
 
       {error && (
         <Card className="border-destructive">

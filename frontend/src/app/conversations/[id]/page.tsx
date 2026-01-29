@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { conversationsAPI, analysisAPI } from '@/lib/api'
 import type { Conversation, ConversationAnalysis } from '@/lib/types'
+import { useNotifications } from '@/components/notifications'
 
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 export default function ConversationDetailPage() {
   const params = useParams()
   const conversationId = params.id as string
+  const { addNotification, removeNotification } = useNotifications()
 
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [analysis, setAnalysis] = useState<ConversationAnalysis | null>(null)
@@ -62,13 +64,43 @@ export default function ConversationDetailPage() {
   }, [loadData])
 
   async function runAnalysis() {
+    const loadingNotificationId = `analysis-${conversationId}`
+
     setAnalyzing(true)
     setError(null)
+
+    // Show loading notification - persistent until analysis completes
+    addNotification({
+      id: loadingNotificationId,
+      type: 'loading',
+      title: 'Analysis in progress',
+      message: 'This may take a moment. You\'ll be notified when it\'s complete.',
+    })
+
     try {
       const result = await analysisAPI.run({ conversation_id: conversationId })
       setAnalysis(result)
+
+      // Remove loading notification and show success
+      removeNotification(loadingNotificationId)
+      addNotification({
+        type: 'success',
+        title: 'Analysis complete',
+        message: 'Conversation has been analyzed successfully.',
+        duration: 5000,
+      })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to run analysis')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to run analysis'
+      setError(errorMessage)
+
+      // Remove loading notification and show error
+      removeNotification(loadingNotificationId)
+      addNotification({
+        type: 'error',
+        title: 'Analysis failed',
+        message: errorMessage,
+        duration: 8000,
+      })
     } finally {
       setAnalyzing(false)
     }

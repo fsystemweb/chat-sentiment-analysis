@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "id": "2bebcebf-3933-49be-b101-53d362180a2a",
+    "conversation_id": "demo_request_1",
+    "analyzed_at": "2026-01-29 11:43:31.057838",
+    "insights": [
+      {
+        "insight_id": "41dc526b-e3b1-4050-b685-7e5f771798e3",
+        "insight_name": "User sentiment",
+        "value": "Positive",
+        "confidence": 1.0,
+        "evidence": "It looks like exactly what we need for customer engagement...Oh that's amazing! That would definitely work for us."
+      },
+      {
+        "insight_id": "2c2e470a-377a-40ff-861a-0eea55cea31f",
+        "insight_name": "Customer Pain Point",
+        "value": "Need for a unified customer engagement and support tool",
+        "confidence": 1.0,
+        "evidence": "Honestly, it's a mess. We're using email, a basic chatbot, and sometimes just responding on social media. We need something more unified."
+      },
+      {
+        "insight_id": "98f3a63f-fecf-4567-871e-b1dcf14f0c86",
+        "insight_name": "Purchase intent",
+        "value": "High",
+        "confidence": 1.0,
+        "evidence": "We're bootstrapped right now, so budget is tight. Ideally under $500/month to start, but we just closed a seed round so we could scale up if needed...Oh that's amazing! That would definitely work for us. Can we set up a proper demo this week?"
+      }
+    ],
+    "questions": [
+      {
+        "question_id": "65f10941-90f3-4591-8d2e-d9583c88d1a6",
+        "question_text": "What's your budget?",
+        "answered": true,
+        "answer": "Ideally under $500/month to start, but we just closed a seed round so we could scale up if needed.",
+        "evidence": null
+      },
+      {
+        "question_id": "1deb96ad-9c4b-4d51-8f10-6e1ccdc7a49e",
+        "question_text": "What's your role?",
+        "answered": true,
+        "answer": "I'm the CEO and co-founder, so I make those calls. My co-founder handles the tech side but he trusts my judgment on operational tools.",
+        "evidence": null
+      }
+    ],
+    "summary": "The conversation is between a sales agent and Emma, the CEO of a startup, discussing a potential purchase of a customer engagement platform. Emma expresses interest in the platform due to her startup's current fragmented approach to customer engagement and support. The agent offers a startup program with a 50% discount for the first year, which Emma finds appealing, and they agree to set up a demo for the following Thursday."
+  }
+]
