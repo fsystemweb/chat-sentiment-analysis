@@ -66,7 +66,7 @@ resource "aws_lb_target_group" "backend" {
 # Target Group for Frontend
 resource "aws_lb_target_group" "frontend" {
   name        = "${var.project_name}-frontend-tg"
-  port        = 80
+  port        = 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"

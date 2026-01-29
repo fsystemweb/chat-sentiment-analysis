@@ -115,7 +115,8 @@
         "elasticloadbalancing:DescribeTargetGroupAttributes",
         "elasticloadbalancing:DescribeTags",
         "elasticloadbalancing:ModifyLoadBalancerAttributes",
-        "elasticloadbalancing:DescribeLoadBalancerAttributes"
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeListenerAttributes"
       ],
       "Resource": "*"
     },

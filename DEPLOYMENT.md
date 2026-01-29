@@ -39,7 +39,7 @@ terraform apply
 # Get ECR repository URLs from Terraform output
 BACKEND_REPO=$(terraform output -raw backend_ecr_repository)
 FRONTEND_REPO=$(terraform output -raw frontend_ecr_repository)
-REGION=$(terraform output -raw aws_region)
+REGION=us-east-1
 
 # Login to ECR
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $BACKEND_REPO
