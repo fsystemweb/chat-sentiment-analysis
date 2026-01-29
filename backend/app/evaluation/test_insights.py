@@ -4,7 +4,7 @@ import pytest
 from deepeval import assert_test
 from deepeval.test_case import LLMTestCase
 from deepeval.metrics import AnswerRelevancyMetric, GEval
-from deepeval.metrics.g_eval import GEvalMetric
+
 
 from app.evaluation.config import LangChainOpenAI, THRESHOLDS
 from app.evaluation.datasets import INSIGHT_TEST_CASES
@@ -28,7 +28,7 @@ async def test_insight_extraction_relevancy(eval_model):
 
         # Convert result to string for evaluation
         actual_output = "\n".join(
-            f"{insight.key}: {insight.value}" for insight in result.insights
+            f"{insight.key}: {insight.value}" for insight in result
         )
 
         test = LLMTestCase(
@@ -56,7 +56,7 @@ async def test_insight_extraction_accuracy(eval_model):
         )
 
         actual_output = "\n".join(
-            f"{insight.key}: {insight.value}" for insight in result.insights
+            f"{insight.key}: {insight.value}" for insight in result
         )
 
         test = LLMTestCase(

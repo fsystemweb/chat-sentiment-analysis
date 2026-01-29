@@ -13,12 +13,13 @@ pytest-asyncio>=0.23.0
 # LangChain for AI orchestration
 langchain==0.3.0
 langchain-openai==0.2.0
+deepeval==3.8.2
 
 
 # OpenAI
 openai==1.109.1
 
 # Utilities
-python-dotenv==1.0.0
+python-dotenv==1.2.1
 aiofiles==23.2.1
 

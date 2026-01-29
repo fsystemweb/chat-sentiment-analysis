@@ -26,7 +26,7 @@ async def test_question_answering_relevancy(eval_model):
         )
 
         actual_output = "\n".join(
-            f"Q: {answer.question}\nA: {answer.answer}" for answer in result.answers
+            f"Q: {answer.question}\nA: {answer.answer}" for answer in result
         )
 
         test = LLMTestCase(
@@ -54,7 +54,7 @@ async def test_question_answering_faithfulness(eval_model):
         )
 
         actual_output = "\n".join(
-            f"Q: {answer.question}\nA: {answer.answer}" for answer in result.answers
+            f"Q: {answer.question}\nA: {answer.answer}" for answer in result
         )
 
         test = LLMTestCase(

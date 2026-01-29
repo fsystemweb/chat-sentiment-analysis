@@ -25,7 +25,7 @@ async def test_summary_quality(eval_model):
 
         test = LLMTestCase(
             input=test_case["input"],
-            actual_output=result.summary,
+            actual_output=result,
         )
 
         summarization_metric = SummarizationMetric(
@@ -46,7 +46,7 @@ async def test_summary_no_hallucination(eval_model):
 
         test = LLMTestCase(
             input=test_case["input"],
-            actual_output=result.summary,
+            actual_output=result,
             context=[test_case["input"]],
         )
 
