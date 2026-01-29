@@ -1,0 +1,75 @@
+{
+    "id": "demo_request_1",
+    "metadata": {
+        "title": "Product Demo Request - StartupXYZ",
+        "source": "demo_request",
+        "date": "2024-01-20T09:15:00Z",
+        "participants": [
+            "Alex (Sales)",
+            "Emma (Founder, StartupXYZ)"
+        ],
+        "tags": [
+            "startup",
+            "demo",
+            "inbound"
+        ]
+    },
+    "messages": [
+        {
+            "role": "agent",
+            "content": "Hi Emma, thanks for requesting a demo! I'm Alex from the sales team. What sparked your interest in our platform?"
+        },
+        {
+            "role": "user",
+            "content": "Hi Alex! We're a young startup and we saw your product featured in TechCrunch. It looks like exactly what we need for customer engagement."
+        },
+        {
+            "role": "agent",
+            "content": "That's great to hear! Tell me a bit about StartupXYZ. What do you do and how big is your team?"
+        },
+        {
+            "role": "user",
+            "content": "We're building an AI-powered fitness app. Right now we're a team of 12 - 8 engineers, 2 designers, and 2 of us handling business operations."
+        },
+        {
+            "role": "agent",
+            "content": "Sounds exciting! What's your current approach to customer engagement and support?"
+        },
+        {
+            "role": "user",
+            "content": "Honestly, it's a mess. We're using email, a basic chatbot, and sometimes just responding on social media. We need something more unified."
+        },
+        {
+            "role": "agent",
+            "content": "I hear you. That fragmented approach is really common for growing startups. Are you the decision-maker for tooling purchases?"
+        },
+        {
+            "role": "user",
+            "content": "Yes, I'm the CEO and co-founder, so I make those calls. My co-founder handles the tech side but he trusts my judgment on operational tools."
+        },
+        {
+            "role": "agent",
+            "content": "Perfect. And do you have a budget in mind for customer engagement tooling?"
+        },
+        {
+            "role": "user",
+            "content": "We're bootstrapped right now, so budget is tight. Ideally under $500/month to start, but we just closed a seed round so we could scale up if needed."
+        },
+        {
+            "role": "agent",
+            "content": "Congratulations on the funding! We actually have a startup program that might be perfect for you - 50% off for the first year."
+        },
+        {
+            "role": "user",
+            "content": "Oh that's amazing! That would definitely work for us. Can we set up a proper demo this week?"
+        },
+        {
+            "role": "agent",
+            "content": "Absolutely! How does Thursday at 2pm work for you?"
+        },
+        {
+            "role": "user",
+            "content": "Perfect, I'll have my co-founder join as well. Looking forward to it!"
+        }
+    ]
+}

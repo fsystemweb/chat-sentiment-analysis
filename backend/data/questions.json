@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "question": "What's your budget?",
+    "description": "",
+    "active": true,
+    "id": "65f10941-90f3-4591-8d2e-d9583c88d1a6",
+    "created_at": "2026-01-29 10:26:34.111839",
+    "updated_at": "2026-01-29 10:26:34.111846"
+  },
+  {
+    "question": "What's your role?",
+    "description": "",
+    "active": true,
+    "id": "1deb96ad-9c4b-4d51-8f10-6e1ccdc7a49e",
+    "created_at": "2026-01-29 10:26:41.446065",
+    "updated_at": "2026-01-29 10:26:41.446073"
+  }
+]
