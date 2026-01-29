@@ -79,6 +79,11 @@ export const conversationsAPI = {
     fetchAPI<import('./types').ConversationSummary[]>('/conversations'),
   getById: (id: string) =>
     fetchAPI<import('./types').Conversation>(`/conversations/${id}`),
+  import: (conversation: import('./types').Conversation) =>
+    fetchAPI<import('./types').Conversation>('/conversations/import', {
+      method: 'POST',
+      body: JSON.stringify(conversation),
+    }),
 }
 
 // Analysis API

@@ -83,6 +83,15 @@ The tests cover:
 - ✅ Multiple messages handling
 - ✅ Error handling (404s)
 
+### Import Endpoint (`/api/conversations/import`)
+- ✅ Import single conversation
+- ✅ Duplicate ID detection (409 Conflict)
+- ✅ Invalid JSON handling (422)
+- ✅ Missing required fields (422)
+- ✅ File size validation (413 - max 600 KB)
+- ✅ Imported conversation retrieval
+- ✅ Imported conversation in list
+
 ### Analysis Endpoints (`/api/analysis`)
 - ✅ Run analysis on conversation
 - ✅ Get analysis by conversation ID

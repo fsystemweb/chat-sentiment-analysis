@@ -85,6 +85,18 @@ class ConversationService:
         
         return None
     
+    async def exists(self, conversation_id: str) -> bool:
+        """Check if a conversation with the given ID exists."""
+        file_path = self.conversations_dir / f"{conversation_id}.json"
+        if file_path.exists():
+            return True
+        # Also search all files in case ID doesn't match filename
+        for file_path in self.conversations_dir.glob("*.json"):
+            conv = self._load_conversation_file(file_path)
+            if conv and conv.id == conversation_id:
+                return True
+        return False
+    
     async def create(self, conversation: Conversation) -> Conversation:
         """Save a new conversation to a file."""
         file_path = self.conversations_dir / f"{conversation.id}.json"
