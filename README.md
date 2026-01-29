@@ -2,6 +2,11 @@
 
 An AI-powered assistant application built with **FastAPI** (backend) and **Next.js** (frontend).
 
+## 🌐 Live Demo
+
+- **Application**: http://agent-assistant-alb-424085493.us-east-1.elb.amazonaws.com/
+- **API Documentation (Swagger)**: http://agent-assistant-alb-424085493.us-east-1.elb.amazonaws.com/docs
+
 ## 📋 Prerequisites
 
 - **Python** 3.10+
@@ -14,7 +19,7 @@ An AI-powered assistant application built with **FastAPI** (backend) and **Next.
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/fsystemweb/agent-assistant.git
 cd agent-assitant
 ```
 
@@ -143,6 +148,22 @@ deepeval test run app/evaluation/ -v
 | Insight Extraction | Answer Relevancy, G-Eval (Accuracy) |
 | Question Answering | Answer Relevancy, Faithfulness |
 | Summary Generation | Summarization, Hallucination |
+
+## 📝 TODO
+
+### Scalability Improvements
+- **Chunk Processing for Large Imports**: Currently, the application works perfectly for an MVP, but if we need to support 1000+ chat conversations for initial import, we should improve the code to process data in chunks to avoid memory issues and timeouts.
+
+### Database Migration
+- **Move from JSON to Relational Database**: The current MVP uses JSON files as a storage solution. This is fine for an MVP, but for production we should migrate to a relational database (e.g., PostgreSQL). This will allow us to:
+  - Create separate tables with proper IDs and foreign keys
+  - Establish relationships between entities (conversations, insights, analysis results)
+  - Enable efficient querying and indexing
+  - Support concurrent access and transactions
+
+### CI/CD & Deployment
+- **Automated Deployments**: Currently, deployment requires running a manual script. Ideally, this should be connected to a webhook (e.g., GitHub Actions) that triggers automatic deployment on push to the main branch.
+- **Multi-Environment Setup**: Add a separate development environment apart from production for testing changes before they go live.
 
 ## 📝 License
 
