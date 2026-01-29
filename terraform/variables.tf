@@ -10,15 +10,22 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "instance_type" {
-  description = "EC2 instance type for both frontend and backend"
-  type        = string
-  default     = "t3.micro"
+variable "container_cpu" {
+  description = "CPU units for ECS containers (256, 512, 1024, etc.)"
+  type        = number
+  default     = 256
 }
 
-variable "key_name" {
-  description = "Name of existing EC2 key pair for SSH access"
-  type        = string
+variable "container_memory" {
+  description = "Memory for ECS containers in MB (512, 1024, 2048, etc.)"
+  type        = number
+  default     = 512
+}
+
+variable "desired_count" {
+  description = "Desired number of ECS tasks"
+  type        = number
+  default     = 1
 }
 
 variable "openai_api_key" {

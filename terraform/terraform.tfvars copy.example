@@ -2,7 +2,6 @@
 # Copy to terraform.tfvars and fill in your values
 
 # Required
-key_name       = "your-ec2-keypair-name"
 openai_api_key = "sk-your-openai-api-key"
 
 # Optional (defaults shown)

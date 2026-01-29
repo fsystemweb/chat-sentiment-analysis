@@ -1,44 +1,29 @@
-output "backend_instance_id" {
-  description = "Backend EC2 instance ID"
-  value       = aws_instance.backend.id
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = aws_lb.main.dns_name
 }
 
-output "backend_public_ip" {
-  description = "Elastic Public IP of the backend EC2 instance"
-  value       = aws_eip.backend.public_ip
+output "application_url" {
+  description = "Application URL via Load Balancer"
+  value       = "http://${aws_lb.main.dns_name}"
 }
 
-output "backend_url" {
-  description = "Backend API URL"
-  value       = "http://${aws_eip.backend.public_ip}:8000"
+output "backend_api_url" {
+  description = "Backend API URL via Load Balancer"
+  value       = "http://${aws_lb.main.dns_name}/api"
 }
 
-output "frontend_instance_id" {
-  description = "Frontend EC2 instance ID"
-  value       = aws_instance.frontend.id
+output "ecs_cluster_name" {
+  description = "ECS Cluster name"
+  value       = aws_ecs_cluster.main.name
 }
 
-output "frontend_public_ip" {
-  description = "Elastic Public IP of the frontend EC2 instance"
-  value       = aws_eip.frontend.public_ip
+output "backend_ecr_repository" {
+  description = "Backend ECR repository URL"
+  value       = aws_ecr_repository.backend.repository_url
 }
 
-output "frontend_url" {
-  description = "Frontend application URL"
-  value       = "http://${aws_eip.frontend.public_ip}:3000"
-}
-
-output "ssh_backend" {
-  description = "SSH command for backend"
-  value       = "ssh -i ${var.key_name} ec2-user@${aws_eip.backend.public_ip}"
-}
-
-output "ssh_frontend" {
-  description = "SSH command for frontend"
-  value       = "ssh -i ${var.key_name} ec2-user@${aws_eip.frontend.public_ip}"
-}
-
-output "s3_bucket" {
-  description = "S3 bucket containing the deployed code"
-  value       = aws_s3_bucket.code_bucket.id
+output "frontend_ecr_repository" {
+  description = "Frontend ECR repository URL"
+  value       = aws_ecr_repository.frontend.repository_url
 }
