@@ -32,9 +32,3 @@ variable "openai_model" {
   type        = string
   default     = "gpt-4"
 }
-
-variable "repo_url" {
-  description = "Git repository URL to clone"
-  type        = string
-  default     = "https://github.com/your-org/agent-assitant.git"
-}

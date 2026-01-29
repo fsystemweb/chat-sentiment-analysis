@@ -16,8 +16,9 @@ dnf install -y nodejs npm git
 mkdir -p /opt/app
 cd /opt/app
 
-# Clone repository
-git clone ${repo_url} .
+# Download code from S3
+aws s3 cp s3://${s3_bucket}/${s3_key} /tmp/code.zip
+unzip /tmp/code.zip
 
 # Navigate to frontend
 cd frontend
@@ -27,7 +28,7 @@ npm install
 
 # Create environment file for backend connection
 cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://${backend_private_ip}:8000
+NEXT_PUBLIC_API_URL=http://${backend_public_ip}:8000
 EOF
 
 # Build the application

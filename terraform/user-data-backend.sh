@@ -16,8 +16,9 @@ dnf install -y python3.11 python3.11-pip python3.11-devel git
 mkdir -p /opt/app
 cd /opt/app
 
-# Clone repository
-git clone ${repo_url} .
+# Download code from S3
+aws s3 cp s3://${s3_bucket}/${s3_key} /tmp/code.zip
+unzip /tmp/code.zip
 
 # Navigate to backend
 cd backend
