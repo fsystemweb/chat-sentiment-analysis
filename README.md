@@ -1,6 +1,6 @@
-# Agent Assistant
+# Chat Sentiment Analysis
 
-An AI-powered assistant application built with **FastAPI** (backend) and **Next.js** (frontend).
+End-to-end AI chat sentiment analyzer using FastAPI, Next.js, LangChain, and AWS.
 
 ## 🌐 Live Demo
 
