@@ -49,14 +49,14 @@ export default function ConversationsPage() {
 
   return (
     <div className="fade-in space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Conversations</h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="text-2xl font-bold sm:text-3xl">Conversations</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             View and analyze your conversations
           </p>
         </div>
-        <Button onClick={() => setImportDialogOpen(true)}>
+        <Button onClick={() => setImportDialogOpen(true)} className="w-full sm:w-auto">
           <Upload className="mr-2 h-4 w-4" />
           Import Conversation
         </Button>
@@ -126,12 +126,12 @@ function ConversationList({ conversations }: { conversations: ConversationSummar
       {conversations.map((conv) => (
         <Link key={conv.id} href={`/conversations/${conv.id}`}>
           <Card className="group cursor-pointer hover:border-primary">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex-1">
+                <h3 className="text-base font-semibold transition-colors group-hover:text-primary sm:text-lg">
                   {conv.title}
                 </h3>
-                <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="mt-2 flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-4 sm:text-sm">
                   <span className="inline-flex items-center gap-1">
                     <MessageSquare className="h-4 w-4" />
                     {conv.message_count} messages
@@ -147,16 +147,16 @@ function ConversationList({ conversations }: { conversations: ConversationSummar
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {conv.has_analysis ? (
-                  <Badge variant="success">
+                  <Badge variant="success" className="text-xs sm:text-sm">
                     <CheckCircle className="mr-1 h-3 w-3" />
                     Analyzed
                   </Badge>
                 ) : (
-                  <Badge variant="warning">Pending</Badge>
+                  <Badge variant="warning" className="text-xs sm:text-sm">Pending</Badge>
                 )}
-                <ArrowRight className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary sm:h-5 sm:w-5" />
               </div>
             </div>
           </Card>

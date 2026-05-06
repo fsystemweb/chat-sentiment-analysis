@@ -65,19 +65,19 @@ export default function AnalysisPage() {
   return (
     <div className="fade-in space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Analysis Overview</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-2xl font-bold sm:text-3xl">Analysis Overview</h1>
+        <p className="mt-2 text-sm text-muted-foreground sm:text-base">
           Aggregate insights and question results across all conversations
         </p>
       </div>
 
       {/* Stats */}
       {aggregate && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card>
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-primary/10 p-3">
-                <MessageSquare className="h-6 w-6 text-primary" />
+                <MessageSquare className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
               </div>
               <div>
                 <div className="text-3xl font-bold">

@@ -2,10 +2,10 @@
 
 End-to-end AI chat sentiment analyzer using FastAPI, Next.js, LangChain, and AWS.
 
-## 🌐 Live Demo
+## 🌐 Live Demo (Deactivated)
 
-- **Application**: http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/
-- **API Documentation (Swagger)**: http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/docs
+- **Application**(Deactivated): http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/
+- **API Documentation (Swagger)**(Deactivated): http://agent-assistant-alb-1868298832.us-east-1.elb.amazonaws.com/docs
 
 ## 📋 Prerequisites
 

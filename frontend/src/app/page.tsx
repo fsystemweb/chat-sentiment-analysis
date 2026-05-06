@@ -114,14 +114,14 @@ export default function Dashboard() {
   return (
     <div className="fade-in space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-2xl font-bold sm:text-3xl">Dashboard</h1>
+        <p className="mt-2 text-sm text-muted-foreground sm:text-base">
           Welcome to the Conversation Insights Analyzer
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
@@ -129,13 +129,13 @@ export default function Dashboard() {
               <Card className="group cursor-pointer hover:border-primary">
                 <div className="flex items-center justify-between">
                   <div className={`rounded-lg p-2 ${stat.bgColor}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
+                    <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
                   </div>
-                  <span className={`text-3xl font-bold ${stat.color}`}>
+                  <span className={`text-2xl font-bold sm:text-3xl ${stat.color}`}>
                     {stat.value}
                   </span>
                 </div>
-                <p className="mt-3 text-muted-foreground transition-colors group-hover:text-foreground">
+                <p className="mt-3 text-xs text-muted-foreground transition-colors group-hover:text-foreground sm:text-sm">
                   {stat.label}
                 </p>
               </Card>
