@@ -19,8 +19,8 @@ End-to-end AI chat sentiment analyzer using FastAPI, Next.js, LangChain, and AWS
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/fsystemweb/agent-assistant.git
-cd agent-assitant
+git clone https://github.com/fsystemweb/chat-sentiment-analysis.git
+cd chat-sentiment-analysis
 ```
 
 ### 2. Backend Setup
@@ -84,7 +84,7 @@ The frontend will be available at: `http://localhost:3000`
 ## 📁 Project Structure
 
 ```
-agent-assitant/
+chat-sentiment-analysis/
 ├── backend/
 │   ├── app/
 │   │   ├── agent/       # AI agent logic
