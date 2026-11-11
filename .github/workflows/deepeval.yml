@@ -1,0 +1,66 @@
+name: DeepEval Suite
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deepeval.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/deepeval.yml"
+  workflow_dispatch:
+
+jobs:
+  deepeval:
+    name: DeepEval LLM evaluation suites
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies
+        working-directory: ${{ env.working-directory }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check DeepEval credentials
+        id: creds
+        working-directory: ${{ env.working-directory }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::OPENAI_API_KEY secret is not set - skipping DeepEval run (LLM-judged metrics need credentials)."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run DeepEval suites
+        if: steps.creds.outputs.skip == 'false'
+        working-directory: ${{ env.working-directory }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          deepeval test run app/evaluation/ --verbose
+
+      - name: Run unit/integration tests
+        working-directory: ${{ env.working-directory }}
+        env:
+          # The suites mock the LLM calls, but Settings requires a non-empty key.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'ci-test-key' }}
+        run: pytest

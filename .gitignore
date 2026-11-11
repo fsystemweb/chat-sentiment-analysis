@@ -68,3 +68,6 @@ Thumbs.db
 # Secrets
 *.pem
 *.key
+
+# DeepEval cache/telemetry/run artifacts
+**/.deepeval/
